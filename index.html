@@ -737,202 +737,49 @@ body.dark-mode,
   }
 }
 </style><web-component>
-
-    
-    
-    <title>База данных деталей</title>
-    
-
-
-
-<div class="container">
-    
-    <!-- БЛОК ДОБАВЛЕНИЯ -->
-    <div class="card">
-        <h2>Массовое добавление</h2>
-        <div class="form-group">
-            <label>Panel_pn (Можно сканировать/вставлять списком, каждый с новой строки)</label>
-            <textarea id="add-panel-pn" rows="5" placeholder="750TBV500S74HHN000
+    <div class="container">
+        <!-- БЛОК ДОБАВЛЕНИЯ -->
+        <div class="card">
+            <h2>Массовое добавление</h2>
+            <div class="form-group">
+                <label>Panel_pn (Можно сканировать/вставлять списком, каждый с новой строки)</label>
+                <textarea id="add-panel-pn" rows="5" placeholder="750TBV500S74HHN000
 750TBV500S78AHN000..."></textarea>
-        </div>
-        <div style="display: flex; gap: 15px;">
-            <div class="form-group" style="flex: 1;"><label>DATA</label><input type="date" id="add-data" /></div>
-            <div class="form-group" style="flex: 1;"><label>PN</label><input type="text" id="add-pn" placeholder="Например: 203BYQ..." /></div>
-        </div>
-        <div style="display: flex; gap: 15px;">
-            <div class="form-group" style="flex: 1;"><label>Location</label><input type="text" id="add-location" placeholder="KUWETRA 666..." /></div>
-            <div class="form-group" style="flex: 1;"><label>info</label><input type="text" id="add-info" placeholder="DIFF PLATE 50" /></div>
-        </div>
-        <button class="btn btn-blue" onclick="addBulk()">+ Добавить список в таблицу</button>
-        <div id="add-status" class="loading"></div>
-    </div>
-
-    <!-- БЛОК ПОИСКА И РЕДАКТИРОВАНИЯ -->
-    <div class="card">
-        <h2>Поиск и Редактирование</h2>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="search-query" placeholder="Введите PN или Panel_pn для поиска (например: 203BYQ500015X2N000)" />
-            <button class="btn btn-blue" onclick="searchData()">Найти</button>
-        </div>
-        <div id="search-status" class="loading"></div>
-
-        <!-- Скрытый блок редактирования, появляется только после поиска -->
-        <div id="edit-section">
-            <h3>Изменить данные для всех найденных строк</h3>
-            <p style="font-size: 12px; color: #555;">Оставьте поле пустым, если не хотите его менять.</p>
-            <div style="display: flex; gap: 10px;">
-                <div style="flex:1"><label>Новая Дата</label><input type="date" id="edit-data" /></div>
-                <div style="flex:1"><label>Новая Локация</label><input type="text" id="edit-location" /></div>
-                <div style="flex:1"><label>Новое info</label><input type="text" id="edit-info" /></div>
             </div>
-            <button class="btn btn-green" onclick="updateBulk()">Применить изменения к списку ниже</button>
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;"><label>DATA</label><input type="date" id="add-data" /></div>
+                <div class="form-group" style="flex: 1;"><label>PN</label><input type="text" id="add-pn" placeholder="Например: 203BYQ..." /></div>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;"><label>Location</label><input type="text" id="add-location" placeholder="KUWETRA 666..." /></div>
+                <div class="form-group" style="flex: 1;"><label>info</label><input type="text" id="add-info" placeholder="DIFF PLATE 50" /></div>
+            </div>
+            <button class="btn btn-blue" onclick="addBulk()">+ Добавить список в таблицу</button>
+            <div id="add-status" class="loading"></div>
         </div>
 
-        <div id="results-container"></div>
+        <!-- БЛОК ПОИСКА И РЕДАКТИРОВАНИЯ -->
+        <div class="card">
+            <h2>Поиск и Редактирование</h2>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="search-query" placeholder="Введите PN или Panel_pn для поиска (например: 203BYQ500015X2N000)" />
+                <button class="btn btn-blue" onclick="searchData()">Найти</button>
+            </div>
+            <div id="search-status" class="loading"></div>
+
+            <!-- Скрытый блок редактирования, появляется только после поиска -->
+            <div id="edit-section" style="display: none;">
+                <h3>Изменить данные для всех найденных строк</h3>
+                <p style="font-size: 12px; color: #555;">Оставьте поле пустым, если не хотите его менять.</p>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex:1"><label>Новая Дата</label><input type="date" id="edit-data" /></div>
+                    <div style="flex:1"><label>Новая Локация</label><input type="text" id="edit-location" /></div>
+                    <div style="flex:1"><label>Новое info</label><input type="text" id="edit-info" /></div>
+                </div>
+                <button class="btn btn-green" onclick="updateBulk()">Применить изменения к списку ниже</button>
+            </div>
+
+            <div id="results-container"></div>
+        </div>
     </div>
-
-</div>
-
-<script>
-    // ВСТАВЬТЕ ВАШУ ССЫЛКУ ИЗ APPS SCRIPT СЮДА!
-    const API_URL = "СЮДА_ВСТАВИТЬ_ВАШУ_ССЫЛКУ";
-    
-    let currentSearchResults = [];
-
-    // Универсальная функция запроса к Google Таблице
-    async function request(payload) {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                // Используем text/plain чтобы обойти блокировки CORS в браузере
-                headers: {'Content-Type': 'text/plain;charset=utf-8'}, 
-                body: JSON.stringify(payload)
-            });
-            return await response.json();
-        } catch (error) {
-            return {success: false, error: error.message};
-        }
-    }
-
-    // 1. ФУНКЦИЯ ДОБАВЛЕНИЯ
-    async function addBulk() {
-        const panelPns = document.getElementById('add-panel-pn').value;
-        if(!panelPns) return alert("Пожалуйста, введите хотя бы один Panel_pn");
-        
-        document.getElementById('add-status').innerText = "Идет запись в таблицу, подождите...";
-        
-        const payload = {
-            action: 'addBulk',
-            panelPns: panelPns,
-            data: document.getElementById('add-data').value,
-            pn: document.getElementById('add-pn').value,
-            location: document.getElementById('add-location').value,
-            info: document.getElementById('add-info').value
-        };
-        
-        const res = await request(payload);
-        document.getElementById('add-status').innerText = "";
-        
-        if(res.success) {
-            alert(res.message);
-            document.getElementById('add-panel-pn').value = ""; // Очищаем только список Panel_pn
-        } else {
-            alert("Ошибка: " + res.error);
-        }
-    }
-
-    // 2. ФУНКЦИЯ ПОИСКА
-    async function searchData() {
-        const q = document.getElementById('search-query').value;
-        if(!q) return alert("Введите запрос для поиска");
-        
-        document.getElementById('search-status').innerText = "Поиск...";
-        document.getElementById('results-container').innerHTML = "";
-        document.getElementById('edit-section').style.display = 'none';
-
-        const res = await request({action: 'search', query: q});
-        document.getElementById('search-status').innerText = "";
-        
-        if(res.success) {
-            currentSearchResults = res.data;
-            if(res.data.length > 0) {
-                renderTable(res.data);
-                document.getElementById('edit-section').style.display = 'block'; // Показываем блок редактирования
-            } else {
-                document.getElementById('results-container').innerHTML = "<b>По вашему запросу ничего не найдено.</b>";
-            }
-        } else {
-            alert("Ошибка поиска: " + res.error);
-        }
-    }
-
-    // Отрисовка таблицы
-    function renderTable(data) {
-        let html = `<table>
-            <tr>
-                <th>Panel_pn</th>
-                <th>DATA</th>
-                <th>PN</th>
-                <th>Location</th>
-                <th>info</th>
-            </tr>`;
-        data.forEach(row => {
-            html += `<tr>
-                <td>${row.panel_pn}</td>
-                <td>${row.data}</td>
-                <td>${row.pn}</td>
-                <td>${row.location}</td>
-                <td>${row.info}</td>
-            </tr>`;
-        });
-        html += "</table>";
-        document.getElementById('results-container').innerHTML = html;
-    }
-
-    // 3. ФУНКЦИЯ ОБНОВЛЕНИЯ
-    async function updateBulk() {
-        if(currentSearchResults.length === 0) return;
-        
-        // Собираем номера строк, которые нужно изменить
-        const rowNumbers = currentSearchResults.map(r => r.rowNumber);
-        const newData = document.getElementById('edit-data').value;
-        const newLocation = document.getElementById('edit-location').value;
-        const newInfo = document.getElementById('edit-info').value;
-
-        if(!newData && !newLocation && !newInfo) {
-            return alert("Заполните хотя бы одно поле для изменения!");
-        }
-
-        const confirmEdit = confirm(`Вы уверены, что хотите обновить ${rowNumbers.length} строк?`);
-        if(!confirmEdit) return;
-
-        document.getElementById('search-status').innerText = "Обновление данных, подождите...";
-        
-        const payload = {
-            action: 'updateBulk',
-            rowNumbers: rowNumbers,
-            data: newData,
-            location: newLocation,
-            info: newInfo
-        };
-        
-        const res = await request(payload);
-        document.getElementById('search-status').innerText = "";
-        
-        if(res.success) {
-            alert(res.message);
-            // Очищаем поля редактирования
-            document.getElementById('edit-data').value = "";
-            document.getElementById('edit-location').value = "";
-            document.getElementById('edit-info').value = "";
-            
-            // Автоматически запускаем поиск заново, чтобы показать обновленные данные
-            searchData(); 
-        } else {
-            alert("Ошибка обновления: " + res.error);
-        }
-    }
-</script>
-
-
 </web-component>
