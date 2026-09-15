@@ -1,0 +1,147 @@
+// ==========================================
+// 1. МЕНЮ ТА ВНУТРІШНІ ФУНКЦІЇ ТАБЛИЦІ
+// ==========================================
+
+function onOpen() {
+  const ui = SpreadsheetApp.getUi();
+  ui.createMenu('🛠 Мої Скрипти')
+    .addItem('🗑 Видалити дублікати (Sheet1)', 'removeDuplicatesFromSheet1')
+    .addItem('➡️ Перенести на Sheet2', 'moveToSheet2')
+    .addToUi();
+}
+
+function removeDuplicatesFromSheet1() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet1 = ss.getSheetByName('Sheet1');
+  const sheet2 = ss.getSheetByName('Sheet2');
+  
+  if (!sheet1 || !sheet2) {
+    SpreadsheetApp.getUi().alert("Ошибка: Проверьте названия листов. Должны быть Sheet1 и Sheet2");
+    return;
+  }
+  
+  const data2 = sheet2.getDataRange().getValues();
+  const keysSheet2 = new Set(
+    data2.map(row => String(row[0]).trim()).filter(val => val !== '')
+  );
+  
+  const data1 = sheet1.getDataRange().getValues();
+  if (data1.length <= 1) return;
+  
+  const header = data1[0];
+  const filteredData = [header];
+  let deletedCount = 0;
+  
+  for (let i = 1; i < data1.length; i++) {
+    const key = String(data1[i][0]).trim();
+    if (keysSheet2.has(key)) {
+      deletedCount++;
+    } else {
+      filteredData.push(data1[i]);
+    }
+  }
+  
+  sheet1.clearContents();
+  sheet1.getRange(1, 1, filteredData.length, filteredData[0].length).setValues(filteredData);
+  SpreadsheetApp.getUi().alert(`Готово! Удалено дубликатов с Sheet1: ${deletedCount}`);
+}
+
+function moveToSheet2() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet1 = ss.getSheetByName('Sheet1');
+  const sheet2 = ss.getSheetByName('Sheet2');
+  
+  if (!sheet1 || !sheet2) {
+    SpreadsheetApp.getUi().alert("Помилка: Перевірте назви аркушів. Повинні бути Sheet1 та Sheet2");
+    return;
+  }
+  
+  const data1 = sheet1.getDataRange().getValues();
+  if (data1.length <= 1) {
+    SpreadsheetApp.getUi().alert("На Sheet1 немає даних для перенесення.");
+    return;
+  }
+  
+  const dataToMove = data1.slice(1);
+  const lastRow2 = sheet2.getLastRow();
+  
+  sheet2.getRange(lastRow2 + 1, 1, dataToMove.length, dataToMove[0].length).setValues(dataToMove);
+  sheet1.getRange(2, 1, sheet1.getLastRow() - 1, sheet1.getLastColumn()).clearContent();
+  
+  SpreadsheetApp.getUi().alert(`Готово! Перенесено ${dataToMove.length} рядків на Sheet2.`);
+}
+
+// ==========================================
+// 2. API ДЛЯ САЙТУ (WEB APP)
+// ==========================================
+
+function doGet(e) {
+  return ContentService.createTextOutput("API работает! Жду запросов от сайта.");
+}
+
+function doPost(e) {
+  var output = {};
+  try {
+    var params = JSON.parse(e.postData.contents);
+    var action = params.action;
+    
+    // Вказываем основной лист для работы сайта (Sheet2)
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Sheet2') || ss.getSheets()[0];
+    
+    // 1. ПОИСК
+    if (action === "search") {
+      var data = sheet.getDataRange().getDisplayValues(); 
+      var results = [];
+      var q = params.query.toLowerCase().trim();
+      
+      for (var i = 1; i < data.length; i++) {
+        var row = data[i];
+        var panelPn = row[2] ? row[2].toString().toLowerCase() : ""; // Столбец C
+        var pn = row[5] ? row[5].toString().toLowerCase() : "";      // Столбец F
+        
+        if (panelPn.indexOf(q) > -1 || pn.indexOf(q) > -1) {
+           results.push({
+             rowNumber: i + 1,
+             panel_pn: row[2], // C
+             data: row[4],     // E
+             pn: row[5],       // F
+             location: row[6], // G
+             info: row[10]     // K
+           });
+        }
+      }
+      output = {success: true, data: results};
+      
+    // 2. МАССОВОЕ ДОБАВЛЕНИЕ
+    } else if (action === "addBulk") {
+      var panelPns = params.panelPns.split(/\r?\n/);
+      var addedCount = 0;
+      
+      for (var j = 0; j < panelPns.length; j++) {
+        var ppn = panelPns[j].trim();
+        if (ppn !== "") {
+          var rowData = ["", "", ppn, "", params.data, params.pn, params.location, "", "", "", params.info];
+          sheet.appendRow(rowData);
+          addedCount++;
+        }
+      }
+      output = {success: true, message: "Успешно добавлено строк: " + addedCount};
+      
+    // 3. МАССОВОЕ ОБНОВЛЕНИЕ
+    } else if (action === "updateBulk") {
+      var rowNumbers = params.rowNumbers; 
+      for (var k = 0; k < rowNumbers.length; k++) {
+        var rowNum = rowNumbers[k];
+        if(params.data !== "") sheet.getRange(rowNum, 5).setValue(params.data);         // Col E
+        if(params.location !== "") sheet.getRange(rowNum, 7).setValue(params.location); // Col G
+        if(params.info !== "") sheet.getRange(rowNum, 11).setValue(params.info);        // Col K
+      }
+      output = {success: true, message: "Успешно обновлено строк: " + rowNumbers.length};
+    }
+  } catch(err) {
+    output = {success: false, error: err.toString()};
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify(output)).setMimeType(ContentService.MimeType.JSON);
+}
