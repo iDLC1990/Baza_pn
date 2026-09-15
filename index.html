@@ -6,94 +6,120 @@
     <title>База данных деталей</title>
     <style>
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #080d12;
+            background-image: linear-gradient(to bottom, #080d12, #101a24);
+            color: #d4d4d4;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
+            min-height: 100vh;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
         .card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: rgba(25, 35, 45, 0.9);
+            border: 1px solid #145e61;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
-        h2 { margin-top: 0; color: #1a73e8; }
-        h3 { margin-top: 0; color: #202124; font-size: 18px; }
+        h2, h3 {
+            margin-top: 0;
+            color: #2dbab1;
+            margin-bottom: 10px;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
         
+        .form-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
         .form-group {
-            margin-bottom: 15px;
+            flex: 1;
+            min-width: 130px;
             display: flex;
             flex-direction: column;
         }
         label {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #5f6368;
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #8da4b5;
+            text-transform: uppercase;
         }
         input, textarea {
-            padding: 10px 12px;
-            border: 1px solid #dadce0;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 6px 8px;
+            background-color: #121922;
+            border: 1px solid #2c4152;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
             font-family: inherit;
             transition: border-color 0.2s;
         }
         input:focus, textarea:focus {
             outline: none;
-            border-color: #1a73e8;
-            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+            border-color: #2dbab1;
+            box-shadow: 0 0 0 1px #2dbab1;
         }
+        textarea { resize: vertical; }
         
         .btn {
-            padding: 10px 16px;
+            padding: 8px 12px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            color: #fff;
+            text-transform: uppercase;
             transition: background 0.2s;
         }
-        .btn-blue { background-color: #1a73e8; }
-        .btn-blue:hover { background-color: #1557b0; }
-        
-        .btn-green { background-color: #188038; margin-top: 15px; }
-        .btn-green:hover { background-color: #115726; }
+        .btn-blue { background-color: #177a7d; }
+        .btn-blue:hover { background-color: #2dbab1; }
+        .btn-green { background-color: #145e61; margin-top: 5px; width: 100%;}
+        .btn-green:hover { background-color: #177a7d; }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 14px;
-            background: #fff;
+            margin-top: 10px;
+            font-size: 11px;
+            background: #121922;
         }
         th, td {
-            border: 1px solid #e8eaed;
-            padding: 12px;
-            text-align: left;
+            border: 1px solid #2c4152;
+            padding: 5px 8px;
+            text-align: center;
         }
-        th { background-color: #f8f9fa; font-weight: 600; color: #202124; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
+        th { 
+            background-color: #177a7d; 
+            font-weight: bold; 
+            color: #fff;
+            text-transform: uppercase;
+        }
+        tr:nth-child(even) { background-color: #18232e; }
+        tr:hover { background-color: #1f2e3d; }
         
-        .loading { font-size: 13px; color: #1a73e8; margin-top: 10px; font-weight: 500; }
+        .loading { font-size: 11px; color: #2dbab1; margin-top: 5px; font-weight: bold; }
         
         #edit-section {
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            background: #121922;
+            border: 1px solid #2c4152;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
         }
+        .hint { font-size: 10px; color: #6b8296; margin-top: 0; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -102,42 +128,39 @@
     <!-- БЛОК ДОБАВЛЕНИЯ -->
     <div class="card">
         <h2>Массовое добавление</h2>
-        <div class="form-group">
-            <label>Panel_pn (Можно сканировать/вставлять списком, каждый с новой строки)</label>
-            <textarea id="add-panel-pn" rows="5" placeholder="750TBV500S74HHN000
-750TBV500S78AHN000..."></textarea>
+        <div class="form-group" style="margin-bottom: 10px;">
+            <label>Panel_pn (Список с новой строки)</label>
+            <textarea id="add-panel-pn" rows="3" placeholder="750TBV500S74HHN000&#10;750TBV500S78AHN000..."></textarea>
         </div>
-        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-            <div class="form-group" style="flex: 1; min-width: 200px;"><label>DATA</label><input type="date" id="add-data" /></div>
-            <div class="form-group" style="flex: 1; min-width: 200px;"><label>PN</label><input type="text" id="add-pn" placeholder="Например: 203BYQ..." /></div>
+        <div class="form-row">
+            <div class="form-group"><label>DATA</label><input type="date" id="add-data" /></div>
+            <div class="form-group"><label>PN</label><input type="text" id="add-pn" placeholder="Например: 203BYQ..." /></div>
+            <div class="form-group"><label>Location</label><input type="text" id="add-location" placeholder="KUWETRA 666" /></div>
+            <div class="form-group"><label>info</label><input type="text" id="add-info" placeholder="DIFF PLATE 50" /></div>
         </div>
-        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-            <div class="form-group" style="flex: 1; min-width: 200px;"><label>Location</label><input type="text" id="add-location" placeholder="KUWETRA 666..." /></div>
-            <div class="form-group" style="flex: 1; min-width: 200px;"><label>info</label><input type="text" id="add-info" placeholder="DIFF PLATE 50" /></div>
-        </div>
-        <button class="btn btn-blue" onclick="addBulk()">+ Добавить список в таблицу</button>
+        <button class="btn btn-blue" onclick="addBulk()">+ Добавить список</button>
         <div id="add-status" class="loading"></div>
     </div>
 
     <!-- БЛОК ПОИСКА И РЕДАКТИРОВАНИЯ -->
     <div class="card">
         <h2>Поиск и Редактирование</h2>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <input type="text" id="search-query" style="flex: 1; min-width: 250px;" placeholder="Введите PN или Panel_pn для поиска" />
-            <button class="btn btn-blue" onclick="searchData()">Найти</button>
+        <div class="form-row" style="margin-bottom: 5px;">
+            <input type="text" id="search-query" style="flex: 3; min-width: 200px;" placeholder="Введите PN или Panel_pn" />
+            <button class="btn btn-blue" style="flex: 1;" onclick="searchData()">Найти</button>
         </div>
         <div id="search-status" class="loading"></div>
 
         <!-- Скрытый блок редактирования -->
         <div id="edit-section" style="display: none;">
-            <h3>Изменить данные для всех найденных строк</h3>
-            <p style="font-size: 13px; color: #5f6368; margin-top: 0;">Оставьте поле пустым, если не хотите его менять.</p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <div class="form-group" style="flex:1; min-width: 150px;"><label>Новая Дата</label><input type="date" id="edit-data" /></div>
-                <div class="form-group" style="flex:1; min-width: 150px;"><label>Новая Локация</label><input type="text" id="edit-location" /></div>
-                <div class="form-group" style="flex:1; min-width: 150px;"><label>Новое info</label><input type="text" id="edit-info" /></div>
+            <h3>Изменить найденные строки</h3>
+            <p class="hint">Оставьте поле пустым, если не хотите его менять.</p>
+            <div class="form-row">
+                <div class="form-group"><label>Новая Дата</label><input type="date" id="edit-data" /></div>
+                <div class="form-group"><label>Новая Локация</label><input type="text" id="edit-location" /></div>
+                <div class="form-group"><label>Новое info</label><input type="text" id="edit-info" /></div>
             </div>
-            <button class="btn btn-green" onclick="updateBulk()">Применить изменения к списку ниже</button>
+            <button class="btn btn-green" onclick="updateBulk()">Применить изменения</button>
         </div>
 
         <div style="overflow-x: auto;">
@@ -147,7 +170,6 @@
 </div>
 
 <script>
-    // ВСТАВЬ СЮДА ССЫЛКУ НА СВОЙ GOOGLE APPS SCRIPT МЕЖДУ КАВЫЧКАМИ
     const API_URL = "https://script.google.com/macros/s/AKfycbzMgmejnm_qu01oojng73VOOoWrRFZ_rZkRLwS-NzkQeYeh3bpMx8D9V93f3pKLq8_i/exec";
     
     let currentSearchResults = [];
@@ -167,9 +189,9 @@
 
     async function addBulk() {
         const panelPns = document.getElementById('add-panel-pn').value;
-        if(!panelPns) return alert("Пожалуйста, введите хотя бы один Panel_pn");
+        if(!panelPns) return alert("Введите хотя бы один Panel_pn");
         
-        document.getElementById('add-status').innerText = "Идет запись в таблицу, подождите...";
+        document.getElementById('add-status').innerText = "Запись...";
         
         const payload = {
             action: 'addBulk',
@@ -186,14 +208,12 @@
         if(res.success) {
             alert(res.message);
             document.getElementById('add-panel-pn').value = ""; 
-        } else {
-            alert("Ошибка: " + res.error);
-        }
+        } else alert("Ошибка: " + res.error);
     }
 
     async function searchData() {
         const q = document.getElementById('search-query').value;
-        if(!q) return alert("Введите запрос для поиска");
+        if(!q) return alert("Введите запрос");
         
         document.getElementById('search-status').innerText = "Поиск...";
         document.getElementById('results-container').innerHTML = "";
@@ -208,11 +228,9 @@
                 renderTable(res.data);
                 document.getElementById('edit-section').style.display = 'block';
             } else {
-                document.getElementById('results-container').innerHTML = "<p>По вашему запросу ничего не найдено.</p>";
+                document.getElementById('results-container').innerHTML = "<p class='hint'>Ничего не найдено.</p>";
             }
-        } else {
-            alert("Ошибка поиска: " + res.error);
-        }
+        } else alert("Ошибка: " + res.error);
     }
 
     function renderTable(data) {
@@ -245,24 +263,19 @@
         const newLocation = document.getElementById('edit-location').value;
         const newInfo = document.getElementById('edit-info').value;
 
-        if(!newData && !newLocation && !newInfo) {
-            return alert("Заполните хотя бы одно поле для изменения!");
-        }
+        if(!newData && !newLocation && !newInfo) return alert("Заполните хотя бы одно поле!");
+        if(!confirm(`Обновить ${rowNumbers.length} строк?`)) return;
 
-        const confirmEdit = confirm(`Вы уверены, что хотите обновить ${rowNumbers.length} строк?`);
-        if(!confirmEdit) return;
-
-        document.getElementById('search-status').innerText = "Обновление данных, подождите...";
+        document.getElementById('search-status').innerText = "Обновление...";
         
-        const payload = {
+        const res = await request({
             action: 'updateBulk',
             rowNumbers: rowNumbers,
             data: newData,
             location: newLocation,
             info: newInfo
-        };
+        });
         
-        const res = await request(payload);
         document.getElementById('search-status').innerText = "";
         
         if(res.success) {
@@ -271,9 +284,7 @@
             document.getElementById('edit-location').value = "";
             document.getElementById('edit-info').value = "";
             searchData(); 
-        } else {
-            alert("Ошибка обновления: " + res.error);
-        }
+        } else alert("Ошибка: " + res.error);
     }
 </script>
 </body>
