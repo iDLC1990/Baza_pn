@@ -1,946 +1,616 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>База данных деталей</title>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>База данных деталей</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #080d12;
+            background-image: linear-gradient(to bottom, #080d12, #101a24);
+            color: #d4d4d4;
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        /* Панель переключения языков с флагами */
+        .lang-switcher {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: -5px;
+        }
+        .lang-flag {
+            cursor: pointer;
+            font-size: 20px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            background: rgba(25, 35, 45, 0.9);
+            border: 1px solid #2c4152;
+            transition: transform 0.2s, border-color 0.2s;
+            line-height: 1;
+        }
+        .lang-flag:hover {
+            transform: scale(1.1);
+            border-color: #2dbab1;
+        }
+        .lang-flag.active {
+            border-color: #2dbab1;
+            box-shadow: 0 0 5px rgba(45, 186, 177, 0.5);
+        }
 
-<style>
-*{box-sizing:border-box}
-body{
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-    background:#080d12;
-    background-image:linear-gradient(to bottom,#080d12,#101a24);
-    color:#d4d4d4;
-    margin:0;
-    padding:15px;
-    min-height:100vh;
-}
-.container{
-    max-width:1000px;
-    margin:0 auto;
-    display:flex;
-    flex-direction:column;
-    gap:15px;
-}
-.lang-switcher{
-    display:flex;
-    justify-content:flex-end;
-    gap:8px;
-    margin-bottom:-5px;
-}
-.lang-flag{
-    cursor:pointer;
-    font-size:20px;
-    padding:2px 4px;
-    border-radius:4px;
-    background:rgba(25,35,45,.9);
-    border:1px solid #2c4152;
-    transition:.2s;
-    line-height:1;
-}
-.lang-flag:hover{
-    transform:scale(1.1);
-    border-color:#2dbab1;
-}
-.lang-flag.active{
-    border-color:#2dbab1;
-    box-shadow:0 0 5px rgba(45,186,177,.5);
-}
-.card{
-    background:rgba(25,35,45,.9);
-    border:1px solid #145e61;
-    border-radius:6px;
-    padding:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,.6);
-}
-h2,h3{
-    margin:0 0 10px;
-    color:#2dbab1;
-    font-size:15px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-}
-.form-row{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:10px;
-}
-.form-group{
-    flex:1;
-    min-width:130px;
-    display:flex;
-    flex-direction:column;
-}
-label{
-    font-size:10px;
-    font-weight:bold;
-    margin-bottom:4px;
-    color:#8da4b5;
-    text-transform:uppercase;
-}
-input,textarea{
-    padding:6px 8px;
-    background:#121922;
-    border:1px solid #2c4152;
-    border-radius:4px;
-    color:#fff;
-    font-size:12px;
-    font-family:inherit;
-    transition:.2s;
-}
-input:focus,textarea:focus{
-    outline:none;
-    border-color:#2dbab1;
-    box-shadow:0 0 0 1px #2dbab1;
-}
-textarea{resize:vertical}
-.btn{
-    padding:8px 12px;
-    border:none;
-    border-radius:4px;
-    cursor:pointer;
-    font-weight:bold;
-    font-size:11px;
-    color:#fff;
-    text-transform:uppercase;
-    transition:.2s;
-}
-.btn-blue{background:#177a7d}
-.btn-blue:hover{background:#2dbab1}
-.btn-green{
-    background:#145e61;
-    margin-top:5px;
-    width:100%;
-}
-.btn-green:hover{background:#177a7d}
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-    font-size:11px;
-    background:#121922;
-}
-th,td{
-    border:1px solid #2c4152;
-    padding:5px 8px;
-    text-align:center;
-}
-th{
-    background:#177a7d;
-    font-weight:bold;
-    color:#fff;
-    text-transform:uppercase;
-}
-tr:nth-child(even){background:#18232e}
-tr:hover{background:#1f2e3d}
-.loading{
-    font-size:11px;
-    color:#2dbab1;
-    margin-top:5px;
-    font-weight:bold;
-}
-#edit-section{
-    background:#121922;
-    border:1px solid #2c4152;
-    padding:10px;
-    border-radius:4px;
-    margin:10px 0;
-}
-.hint{
-    font-size:10px;
-    color:#6b8296;
-    margin:0 0 8px;
-}
+        .card {
+            background: rgba(25, 35, 45, 0.9);
+            border: 1px solid #145e61;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+        h2, h3 {
+            margin-top: 0;
+            color: #2dbab1;
+            margin-bottom: 10px;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 130px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #8da4b5;
+            text-transform: uppercase;
+        }
+        input, textarea {
+            padding: 6px 8px;
+            background-color: #121922;
+            border: 1px solid #2c4152;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2dbab1;
+            box-shadow: 0 0 0 1px #2dbab1;
+        }
+        textarea { resize: vertical; }
+        
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            color: #fff;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+        .btn-blue { background-color: #177a7d; }
+        .btn-blue:hover { background-color: #2dbab1; }
+        .btn-green { background-color: #145e61; margin-top: 5px; width: 100%;}
+        .btn-green:hover { background-color: #177a7d; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 11px;
+            background: #121922;
+        }
+        th, td {
+            border: 1px solid #2c4152;
+            padding: 5px 8px;
+            text-align: center;
+        }
+        th { 
+            background-color: #177a7d; 
+            font-weight: bold; 
+            color: #fff;
+            text-transform: uppercase;
+        }
+        tr:nth-child(even) { background-color: #18232e; }
+        tr:hover { background-color: #1f2e3d; }
+        
+        .loading { font-size: 11px; color: #2dbab1; margin-top: 5px; font-weight: bold; }
+        
+        #edit-section {
+            background: #121922;
+            border: 1px solid #2c4152;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .hint { font-size: 10px; color: #6b8296; margin-top: 0; margin-bottom: 8px; }
 
-/* ===== ЭТИКЕТКА ===== */
-#print-area{display:none}
 
-.print-label{
-    width:100mm;
-    height:78mm;
-    background:#fff;
-    color:#000;
-    font-family:Arial,Helvetica,sans-serif;
-    padding:5mm 7mm;
-    box-sizing:border-box;
-    overflow:hidden;
-    page-break-after:always;
-    break-after:page;
-}
+        /* ===== МУЛЬТЯШНАЯ SVG-АНИМАЦИЯ ===== */
+        #cartoon-animation{
+            position:fixed;
+            left:50%;
+            bottom:12px;
+            transform:translateX(-50%);
+            width:min(900px,calc(100vw - 24px));
+            height:150px;
+            z-index:9999;
+            display:none;
+            pointer-events:none;
+            background:rgba(8,13,18,.94);
+            border:1px solid #145e61;
+            border-radius:8px;
+            box-shadow:0 8px 30px rgba(0,0,0,.65);
+            overflow:hidden;
+        }
+        #cartoon-animation.show{display:block}
+        #cartoon-animation svg{display:block;width:100%;height:100%}
+        .cartoon-ground{stroke:#2dbab1;stroke-width:3}
+        .cartoon-homer{animation:homerChase 17s linear both}
+        .cartoon-bart{animation:bartRun 17s linear both}
+        .cartoon-gun{animation:gunRun 17s linear both;transform-box:fill-box;transform-origin:center}
+        .cartoon-text{font:700 12px Arial,sans-serif;fill:#fff}
 
-.print-block{
-    margin-bottom:4mm;
-}
-
-.print-title{
-    font-size:10pt;
-    font-weight:900;
-    line-height:1;
-    margin-bottom:1.5mm;
-}
-
-.print-value{
-    font-size:16pt;
-    font-weight:900;
-    line-height:1.1;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:clip;
-}
-
-.print-barcode{
-    display:block;
-    width:86mm !important;
-    height:22mm !important;
-    margin:6mm auto 0;
-}
-
-@page{
-    size:100mm 78mm;
-    margin:0;
-}
-
-@media print{
-    html,body{
-        width:100mm !important;
-        min-width:100mm !important;
-        margin:0 !important;
-        padding:0 !important;
-        background:#fff !important;
-    }
-
-    body *{
-        visibility:hidden !important;
-    }
-
-    #print-area,
-    #print-area *{
-        visibility:visible !important;
-    }
-
-    #print-area{
-        display:block !important;
-        position:absolute !important;
-        left:0 !important;
-        top:0 !important;
-        width:100mm !important;
-        margin:0 !important;
-        padding:0 !important;
-    }
-
-    .print-label{
-        display:block !important;
-        width:100mm !important;
-        height:78mm !important;
-        margin:0 !important;
-        padding:5mm 7mm !important;
-        box-sizing:border-box !important;
-        page-break-after:always !important;
-        break-after:page !important;
-        overflow:hidden !important;
-    }
-}
-</style>
+        @keyframes homerChase{
+            0%{transform:translateX(-220px)}
+            18%{transform:translateX(120px)}
+            28%{transform:translateX(250px)}
+            42%{transform:translateX(265px)}
+            55%{transform:translateX(300px)}
+            72%{transform:translateX(690px)}
+            100%{transform:translateX(1080px)}
+        }
+        @keyframes bartRun{
+            0%{transform:translateX(-30px)}
+            18%{transform:translateX(40px)}
+            28%{transform:translateX(170px)}
+            42%{transform:translateX(195px)}
+            55%{transform:translateX(225px)}
+            72%{transform:translateX(580px)}
+            100%{transform:translateX(980px)}
+        }
+        @keyframes gunRun{
+            0%{transform:translateX(-30px);opacity:0}
+            53%{transform:translateX(220px);opacity:0}
+            58%{transform:translateX(250px);opacity:1}
+            72%{transform:translateX(575px);opacity:1}
+            100%{transform:translateX(975px);opacity:1}
+        }
+        .cartoon-grab{animation:grab 17s linear both;transform-box:fill-box;transform-origin:center}
+        @keyframes grab{
+            0%,24%{transform:scale(1);opacity:0}
+            27%,43%{transform:scale(1.08);opacity:1}
+            46%,100%{transform:scale(1);opacity:0}
+        }
+        .cartoon-title{animation:titlePulse 17s linear both}
+        @keyframes titlePulse{
+            0%,20%{opacity:0}
+            22%,70%{opacity:1}
+            75%,100%{opacity:0}
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="container">
-
-    <!-- ЯЗЫК -->
+    <!-- ПАНЕЛЬ ФЛАГОВ (ЯЗЫКИ) -->
     <div class="lang-switcher">
-        <span class="lang-flag" onclick="setLanguage('ru',this)" title="Русский">🇷🇺</span>
-        <span class="lang-flag" onclick="setLanguage('uk',this)" title="Українська">🇺🇦</span>
-        <span class="lang-flag" onclick="setLanguage('pl',this)" title="Polski">🇵🇱</span>
-        <span class="lang-flag" onclick="setLanguage('en',this)" title="English">🇬🇧</span>
+        <span class="lang-flag" onclick="setLanguage('ru')" title="Русский">🇷🇺</span>
+        <span class="lang-flag" onclick="setLanguage('uk')" title="Українська">🇺🇦</span>
+        <span class="lang-flag" onclick="setLanguage('pl')" title="Polski">🇵🇱</span>
+        <span class="lang-flag" onclick="setLanguage('en')" title="English">🇬🇧</span>
     </div>
 
-    <!-- ДОБАВЛЕНИЕ -->
+    <!-- БЛОК ДОБАВЛЕНИЯ -->
     <div class="card">
         <h2 data-i18n="addTitle">Массовое добавление</h2>
-
-        <div class="form-group" style="margin-bottom:10px">
-            <label data-i18n="labelPanelPn">
-                Panel_pn (Список с новой строки)
-            </label>
-
-            <textarea
-                id="add-panel-pn"
-                rows="3"
-                placeholder="750TBV500S74HHN000&#10;750TBV500S78AHN000..."
-            ></textarea>
+        <div class="form-group" style="margin-bottom: 10px;">
+            <label data-i18n="labelPanelPn">Panel_pn (Список с новой строки)</label>
+            <textarea id="add-panel-pn" rows="3" placeholder="750TBV500S74HHN000&#10;750TBV500S78AHN000..."></textarea>
         </div>
-
         <div class="form-row">
-
-            <div class="form-group">
-                <label data-i18n="labelData">DATA</label>
-                <input type="date" id="add-data">
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="labelPn">PN</label>
-                <input type="text" id="add-pn" placeholder="Например: 203BYQ...">
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="labelLocation">Location</label>
-                <input type="text" id="add-location" placeholder="KUWETA 666">
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="labelInfo">info</label>
-                <input type="text" id="add-info" placeholder="DIFF PLATE 50">
-            </div>
-
+            <div class="form-group"><label data-i18n="labelData">DATA</label><input type="date" id="add-data" /></div>
+            <div class="form-group"><label data-i18n="labelPn">PN</label><input type="text" id="add-pn" placeholder="Например: 203BYQ..." /></div>
+            <div class="form-group"><label data-i18n="labelLocation">Location</label><input type="text" id="add-location" placeholder="KUWETRA 666" /></div>
+            <div class="form-group"><label data-i18n="labelInfo">info</label><input type="text" id="add-info" placeholder="DIFF PLATE 50" /></div>
         </div>
-
-        <button
-            class="btn btn-blue"
-            onclick="addBulk()"
-            data-i18n="btnAdd"
-        >
-            + Добавить список
-        </button>
-
+        <button class="btn btn-blue" onclick="addBulk()" data-i18n="btnAdd">+ Добавить список</button>
         <div id="add-status" class="loading"></div>
     </div>
 
-    <!-- ПОИСК -->
+    <!-- БЛОК ПОИСКА И РЕДАКТИРОВАНИЯ -->
     <div class="card">
-
-        <h2 data-i18n="searchTitle">
-            Поиск и Редактирование
-        </h2>
-
-        <div class="form-row" style="margin-bottom:5px">
-
-            <input
-                type="text"
-                id="search-query"
-                style="flex:3;min-width:200px"
-                placeholder="Введите PN или Panel_pn"
-                data-i18n-placeholder="searchPlaceholder"
-            >
-
-            <button
-                class="btn btn-blue"
-                style="flex:1"
-                onclick="searchData()"
-                data-i18n="btnSearch"
-            >
-                Найти
-            </button>
-
+        <h2 data-i18n="searchTitle">Поиск и Редактирование</h2>
+        <div class="form-row" style="margin-bottom: 5px;">
+            <input type="text" id="search-query" style="flex: 3; min-width: 200px;" placeholder="Введите PN или Panel_pn" data-i18n-placeholder="searchPlaceholder" />
+            <button class="btn btn-blue" style="flex: 1;" onclick="searchData()" data-i18n="btnSearch">Найти</button>
         </div>
-
         <div id="search-status" class="loading"></div>
 
-        <!-- РЕДАКТИРОВАНИЕ -->
-        <div id="edit-section" style="display:none">
-
-            <h3 data-i18n="editTitle">
-                Изменить найденные строки
-            </h3>
-
-            <p class="hint" data-i18n="editHint">
-                Оставьте поле пустым, если не хотите его менять.
-            </p>
-
+        <!-- Скрытый блок редактирования -->
+        <div id="edit-section" style="display: none;">
+            <h3 data-i18n="editTitle">Изменить найденные строки</h3>
+            <p class="hint" data-i18n="editHint">Оставьте поле пустым, если не хотите его менять.</p>
             <div class="form-row">
-
-                <div class="form-group">
-                    <label data-i18n="labelNewData">
-                        Новая Дата
-                    </label>
-                    <input type="date" id="edit-data">
-                </div>
-
-                <div class="form-group">
-                    <label data-i18n="labelNewLocation">
-                        Новая Локация
-                    </label>
-                    <input type="text" id="edit-location">
-                </div>
-
-                <div class="form-group">
-                    <label data-i18n="labelNewInfo">
-                        Новое info
-                    </label>
-                    <input type="text" id="edit-info">
-                </div>
-
+                <div class="form-group"><label data-i18n="labelNewData">Новая Дата</label><input type="date" id="edit-data" /></div>
+                <div class="form-group"><label data-i18n="labelNewLocation">Новая Локация</label><input type="text" id="edit-location" /></div>
+                <div class="form-group"><label data-i18n="labelNewInfo">Новое info</label><input type="text" id="edit-info" /></div>
             </div>
-
-            <button
-                class="btn btn-green"
-                onclick="updateBulk()"
-                data-i18n="btnUpdate"
-            >
-                Применить изменения
-            </button>
-
+            <button class="btn btn-green" onclick="updateBulk()" data-i18n="btnUpdate">Применить изменения</button>
         </div>
 
-        <div style="overflow-x:auto">
+        <div style="overflow-x: auto;">
             <div id="results-container"></div>
         </div>
-
     </div>
 </div>
 
-<!-- ОБЛАСТЬ ПЕЧАТИ -->
-<div id="print-area"></div>
-
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOnMILNgecMKkefI7P81pSR4hxiLQXIa9rirL8LCM7s0AzT/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOnMILNgecMKkefI7P81pSR4hxiLQXIa9rirL8LCM7s0AzT/exec";
+    
+    let currentSearchResults = [];
 
-let currentSearchResults=[];
-let currentLang=localStorage.getItem("site_lang")||"ru";
-
-/* ===== ПЕРЕВОДЫ ===== */
-
-const translations={
-    ru:{
-        addTitle:"Массовое добавление",
-        labelPanelPn:"Panel_pn (Список с новой строки)",
-        labelData:"DATA",
-        labelPn:"PN",
-        labelLocation:"Location",
-        labelInfo:"info",
-        btnAdd:"+ Добавить список",
-        searchTitle:"Поиск и Редактирование",
-        searchPlaceholder:"Введите PN или Panel_pn",
-        btnSearch:"Найти",
-        editTitle:"Изменить найденные строки",
-        editHint:"Оставьте поле пустым, если не хотите его менять.",
-        labelNewData:"Новая Дата",
-        labelNewLocation:"Новая Локация",
-        labelNewInfo:"Новое info",
-        btnUpdate:"Применить изменения",
-        statusRecord:"Запись...",
-        statusSearch:"Поиск...",
-        statusUpdate:"Обновление...",
-        notFound:"Ничего не найдено.",
-        errEnterPn:"Введите хотя бы один Panel_pn",
-        errEnterQuery:"Введите запрос",
-        errFillOne:"Заполните хотя бы одно поле!",
-        confirmUpdate:c=>`Обновить ${c} строк?`
-    },
-
-    uk:{
-        addTitle:"Масове додавання",
-        labelPanelPn:"Panel_pn (Список з нового рядка)",
-        labelData:"DATA",
-        labelPn:"PN",
-        labelLocation:"Location",
-        labelInfo:"info",
-        btnAdd:"+ Додати список",
-        searchTitle:"Пошук та Редагування",
-        searchPlaceholder:"Введіть PN або Panel_pn",
-        btnSearch:"Знайти",
-        editTitle:"Змінити знайдені рядки",
-        editHint:"Залиште поле порожнім, якщо не хочете його змінювати.",
-        labelNewData:"Нова Дата",
-        labelNewLocation:"Нова Локація",
-        labelNewInfo:"Нове info",
-        btnUpdate:"Застосувати зміни",
-        statusRecord:"Запис...",
-        statusSearch:"Пошук...",
-        statusUpdate:"Оновлення...",
-        notFound:"Нічого не знайдено.",
-        errEnterPn:"Введіть хоча б один Panel_pn",
-        errEnterQuery:"Введіть запит",
-        errFillOne:"Заповніть хоча б одне поле!",
-        confirmUpdate:c=>`Оновити ${c} рядків?`
-    },
-
-    pl:{
-        addTitle:"Masowe dodawanie",
-        labelPanelPn:"Panel_pn (Lista z nowej linii)",
-        labelData:"DATA",
-        labelPn:"PN",
-        labelLocation:"Location",
-        labelInfo:"info",
-        btnAdd:"+ Dodaj listę",
-        searchTitle:"Wyszukiwanie i Edycja",
-        searchPlaceholder:"Wpisz PN lub Panel_pn",
-        btnSearch:"Szukaj",
-        editTitle:"Edytuj znalezione wiersze",
-        editHint:"Pozostaw pole puste, jeśli chcesz je pominąć.",
-        labelNewData:"Nowa Data",
-        labelNewLocation:"Nowa Lokalizacja",
-        labelNewInfo:"Nowe info",
-        btnUpdate:"Zastosuj zmiany",
-        statusRecord:"Zapisywanie...",
-        statusSearch:"Szukanie...",
-        statusUpdate:"Aktualizacja...",
-        notFound:"Nic nie znaleziono.",
-        errEnterPn:"Wprowadź co najmniej jeden Panel_pn",
-        errEnterQuery:"Wprowadź zapytanie",
-        errFillOne:"Wypełnij co najmniej jedno pole!",
-        confirmUpdate:c=>`Zaktualizować ${c} wierszy?`
-    },
-
-    en:{
-        addTitle:"Bulk Add",
-        labelPanelPn:"Panel_pn (List, one per line)",
-        labelData:"DATA",
-        labelPn:"PN",
-        labelLocation:"Location",
-        labelInfo:"info",
-        btnAdd:"+ Add List",
-        searchTitle:"Search & Edit",
-        searchPlaceholder:"Enter PN or Panel_pn",
-        btnSearch:"Search",
-        editTitle:"Edit Found Rows",
-        editHint:"Leave the field empty if you don't want to change it.",
-        labelNewData:"New Date",
-        labelNewLocation:"New Location",
-        labelNewInfo:"New info",
-        btnUpdate:"Apply Changes",
-        statusRecord:"Saving...",
-        statusSearch:"Searching...",
-        statusUpdate:"Updating...",
-        notFound:"Nothing found.",
-        errEnterPn:"Enter at least one Panel_pn",
-        errEnterQuery:"Enter search query",
-        errFillOne:"Fill out at least one field!",
-        confirmUpdate:c=>`Update ${c} rows?`
-    }
-};
-
-/* ===== ЯЗЫК ===== */
-
-function setLanguage(lang,element){
-    currentLang=lang;
-    localStorage.setItem("site_lang",lang);
-
-    document.querySelectorAll(".lang-flag").forEach(el=>{
-        el.classList.remove("active");
-    });
-
-    if(element){
-        element.classList.add("active");
-    }else{
-        const flags=document.querySelectorAll(".lang-flag");
-        const indexes={ru:0,uk:1,pl:2,en:3};
-        if(flags[indexes[lang]]){
-            flags[indexes[lang]].classList.add("active");
+    // Словарь переводов для 4 языков
+    const translations = {
+        ru: {
+            addTitle: "Массовое добавление",
+            labelPanelPn: "Panel_pn (Список с новой строки)",
+            labelData: "DATA",
+            labelPn: "PN",
+            labelLocation: "Location",
+            labelInfo: "info",
+            btnAdd: "+ Добавить список",
+            searchTitle: "Поиск и Редактирование",
+            searchPlaceholder: "Введите PN или Panel_pn",
+            btnSearch: "Найти",
+            editTitle: "Изменить найденные строки",
+            editHint: "Оставьте поле пустым, если не хотите его менять.",
+            labelNewData: "Новая Дата",
+            labelNewLocation: "Новая Локация",
+            labelNewInfo: "Новое info",
+            btnUpdate: "Применить изменения",
+            statusRecord: "Запись...",
+            statusSearch: "Поиск...",
+            statusUpdate: "Обновление...",
+            notFound: "Ничего не найдено.",
+            errEnterPn: "Введите хотя бы один Panel_pn",
+            errEnterQuery: "Введите запрос",
+            errFillOne: "Заполните хотя бы одно поле!",
+            confirmUpdate: (count) => `Обновить ${count} строк?`
+        },
+        uk: {
+            addTitle: "Масове додавання",
+            labelPanelPn: "Panel_pn (Список з нового рядка)",
+            labelData: "DATA",
+            labelPn: "PN",
+            labelLocation: "Location",
+            labelInfo: "info",
+            btnAdd: "+ Додати список",
+            searchTitle: "Пошук та Редагування",
+            searchPlaceholder: "Введіть PN або Panel_pn",
+            btnSearch: "Знайти",
+            editTitle: "Змінити знайдені рядки",
+            editHint: "Залиште поле порожнім, якщо не хочете його змінювати.",
+            labelNewData: "Нова Дата",
+            labelNewLocation: "Нова Локація",
+            labelNewInfo: "Нове info",
+            btnUpdate: "Застосувати зміни",
+            statusRecord: "Запис...",
+            statusSearch: "Пошук...",
+            statusUpdate: "Оновлення...",
+            notFound: "Нічого не знайдено.",
+            errEnterPn: "Введіть хоча б один Panel_pn",
+            errEnterQuery: "Введіть запит",
+            errFillOne: "Заповніть хоча б одне поле!",
+            confirmUpdate: (count) => `Оновити ${count} рядків?`
+        },
+        pl: {
+            addTitle: "Masowe dodawanie",
+            labelPanelPn: "Panel_pn (Lista z nowej linii)",
+            labelData: "DATA",
+            labelPn: "PN",
+            labelLocation: "Location",
+            labelInfo: "info",
+            btnAdd: "+ Dodaj listę",
+            searchTitle: "Wyszukiwanie i Edycja",
+            searchPlaceholder: "Wpisz PN lub Panel_pn",
+            btnSearch: "Szukaj",
+            editTitle: "Edytuj znalezione wiersze",
+            editHint: "Pozostaw pole puste, jeśli chcesz je pominąć.",
+            labelNewData: "Nowa Data",
+            labelNewLocation: "Nowa Lokalizacja",
+            labelNewInfo: "Nowe info",
+            btnUpdate: "Zastosuj zmiany",
+            statusRecord: "Zapisywanie...",
+            statusSearch: "Szukanie...",
+            statusUpdate: "Aktualizacja...",
+            notFound: "Nic nie znaleziono.",
+            errEnterPn: "Wprowadź co najmniej jeden Panel_pn",
+            errEnterQuery: "Wprowadź zapytanie",
+            errFillOne: "Wypełnij co najmniej jedno pole!",
+            confirmUpdate: (count) => `Zaktualizować ${count} wierszy?`
+        },
+        en: {
+            addTitle: "Bulk Add",
+            labelPanelPn: "Panel_pn (List, one per line)",
+            labelData: "DATA",
+            labelPn: "PN",
+            labelLocation: "Location",
+            labelInfo: "info",
+            btnAdd: "+ Add List",
+            searchTitle: "Search & Edit",
+            searchPlaceholder: "Enter PN or Panel_pn",
+            btnSearch: "Search",
+            editTitle: "Edit Found Rows",
+            editHint: "Leave the field empty if you don't want to change it.",
+            labelNewData: "New Date",
+            labelNewLocation: "New Location",
+            labelNewInfo: "New info",
+            btnUpdate: "Apply Changes",
+            statusRecord: "Saving...",
+            statusSearch: "Searching...",
+            statusUpdate: "Updating...",
+            notFound: "Nothing found.",
+            errEnterPn: "Enter at least one Panel_pn",
+            errEnterQuery: "Enter search query",
+            errFillOne: "Fill out at least one field!",
+            confirmUpdate: (count) => `Update ${count} rows?`
         }
-    }
+    };
 
-    document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const key=el.getAttribute("data-i18n");
-        if(translations[lang][key]){
-            el.textContent=translations[lang][key];
-        }
-    });
+    let currentLang = localStorage.getItem('site_lang') || 'ru';
 
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
-        const key=el.getAttribute("data-i18n-placeholder");
-        if(translations[lang][key]){
-            el.placeholder=translations[lang][key];
-        }
-    });
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('site_lang', lang);
 
-    if(currentSearchResults.length){
-        renderTable(currentSearchResults);
-    }
-}
+        // Подсветка активного флага
+        document.querySelectorAll('.lang-flag').forEach(el => {
+            el.classList.remove('active');
+        });
+        event && event.target && event.target.classList.add('active');
 
-window.addEventListener("DOMContentLoaded",()=>{
-    setLanguage(currentLang);
-});
-
-/* ===== API ===== */
-
-async function request(payload){
-    try{
-        const response=await fetch(API_URL,{
-            method:"POST",
-            headers:{
-                "Content-Type":"text/plain;charset=utf-8"
-            },
-            body:JSON.stringify(payload)
+        // Меняем тексты по атрибуту data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang][key]) {
+                el.innerText = translations[lang][key];
+            }
         });
 
-        return await response.json();
+        // Меняем placeholder'ы
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (translations[lang][key]) {
+                el.placeholder = translations[lang][key];
+            }
+        });
 
-    }catch(error){
-        return{
-            success:false,
-            error:error.message
+        // Если таблица результатов уже открыта, перерисовываем заголовки таблиц
+        if (currentSearchResults.length > 0) {
+            renderTable(currentSearchResults);
+        }
+    }
+
+    // Инициализация языка при загрузке страницы
+    window.addEventListener('DOMContentLoaded', () => {
+        setLanguage(currentLang);
+        // Выставим класс active нужному флагу визуально
+        const flags = document.querySelectorAll('.lang-flag');
+        if(currentLang === 'ru') flags[0].classList.add('active');
+        if(currentLang === 'uk') flags[1].classList.add('active');
+        if(currentLang === 'pl') flags[2].classList.add('active');
+        if(currentLang === 'en') flags[3].classList.add('active');
+    });
+
+    async function request(payload) {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'text/plain;charset=utf-8'}, 
+                body: JSON.stringify(payload)
+            });
+            return await response.json();
+        } catch (error) {
+            return {success: false, error: error.message};
+        }
+    }
+
+    async function addBulk() {
+        const panelPns = document.getElementById('add-panel-pn').value;
+        if(!panelPns) return alert(translations[currentLang].errEnterPn);
+        
+        document.getElementById('add-status').innerText = translations[currentLang].statusRecord;
+        
+        const payload = {
+            action: 'addBulk',
+            panelPns: panelPns,
+            data: document.getElementById('add-data').value,
+            pn: document.getElementById('add-pn').value,
+            location: document.getElementById('add-location').value,
+            info: document.getElementById('add-info').value
         };
-    }
-}
-
-/* ===== ЗАЩИТА HTML ===== */
-
-function escapeHtml(value){
-    return String(value??"")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-}
-
-/* ===== ДАТА ===== */
-
-function formatDate(value){
-    if(!value)return"";
-
-    const text=String(value);
-
-    const match=text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-
-    if(match){
-        return`${match[3]}.${match[2]}.${match[1]}`;
-    }
-
-    return text;
-}
-
-/* =========================================================
-   ПЕЧАТЬ
-   ВСЕГДА РОВНО 2 ОДИНАКОВЫЕ ЭТИКЕТКИ
-   ========================================================= */
-
-function printLabels(data,pn,location){
-
-    const area=document.getElementById("print-area");
-
-    const dateText=escapeHtml(formatDate(data));
-    const pnText=escapeHtml(pn);
-    const locationText=escapeHtml(location);
-
-    /*
-     * Одна готовая этикетка.
-     * Потом она вставляется 2 раза.
-     */
-    const label=`
-        <div class="print-label">
-
-            <div class="print-block">
-                <div class="print-title">DATA</div>
-                <div class="print-value">${dateText}</div>
-            </div>
-
-            <div class="print-block">
-                <div class="print-title">PN</div>
-                <div class="print-value">${pnText}</div>
-            </div>
-
-            <div class="print-block">
-                <div class="print-title">LOCATION</div>
-                <div class="print-value">${locationText}</div>
-            </div>
-
-            <svg class="print-barcode"></svg>
-
-        </div>
-    `;
-
-    /*
-     * ВАЖНО:
-     * Только 2 этикетки.
-     * Не зависит от количества найденных строк.
-     */
-    area.innerHTML=label+label;
-
-    const barcodes=area.querySelectorAll(".print-barcode");
-
-    barcodes.forEach(svg=>{
-        JsBarcode(svg,String(pn),{
-            format:"CODE128B",
-            displayValue:false,
-            width:2,
-            height:70,
-            margin:0,
-            lineColor:"#000",
-            background:"#fff"
-        });
-    });
-
-    area.style.display="block";
-
-    /*
-     * Небольшая задержка нужна,
-     * чтобы SVG штрихкода успел отрисоваться.
-     */
-    setTimeout(()=>{
-        window.print();
-    },300);
-}
-
-/* После закрытия окна печати очищаем область */
-
-window.addEventListener("afterprint",()=>{
-    const area=document.getElementById("print-area");
-
-    area.innerHTML="";
-    area.style.display="none";
-});
-
-/* =========================================================
-   ДОБАВЛЕНИЕ
-   ========================================================= */
-
-async function addBulk(){
-
-    const panelPns=
-        document.getElementById("add-panel-pn").value.trim();
-
-    if(!panelPns){
-        alert(translations[currentLang].errEnterPn);
-        return;
-    }
-
-    const data=
-        document.getElementById("add-data").value;
-
-    const pn=
-        document.getElementById("add-pn").value.trim();
-
-    const location=
-        document.getElementById("add-location").value.trim();
-
-    const info=
-        document.getElementById("add-info").value;
-
-    document.getElementById("add-status").textContent=
-        translations[currentLang].statusRecord;
-
-    const res=await request({
-        action:"addBulk",
-        panelPns:panelPns,
-        data:data,
-        pn:pn,
-        location:location,
-        info:info
-    });
-
-    document.getElementById("add-status").textContent="";
-
-    if(res.success){
-
-        /*
-         * СНАЧАЛА сохраняем данные.
-         * ПОТОМ печатаем ровно 2 этикетки.
-         */
-        printLabels(
-            data,
-            pn,
-            location
-        );
-
-        document.getElementById("add-panel-pn").value="";
-        document.getElementById("add-info").value="";
-
-        setTimeout(()=>{
+        
+        const res = await request(payload);
+        document.getElementById('add-status').innerText = "";
+        
+        if(res.success) {
             alert(res.message);
-        },500);
-
-    }else{
-        alert("Ошибка: "+res.error);
-    }
-}
-
-/* =========================================================
-   ПОИСК
-   ========================================================= */
-
-async function searchData(){
-
-    const q=
-        document.getElementById("search-query").value.trim();
-
-    if(!q){
-        alert(translations[currentLang].errEnterQuery);
-        return;
+            document.getElementById('add-panel-pn').value = ""; 
+        } else alert("Ошибка: " + res.error);
     }
 
-    document.getElementById("search-status").textContent=
-        translations[currentLang].statusSearch;
+    async function searchData() {
+        const q = document.getElementById('search-query').value;
+        if(!q) return alert(translations[currentLang].errEnterQuery);
+        
+        document.getElementById('search-status').innerText = translations[currentLang].statusSearch;
+        document.getElementById('results-container').innerHTML = "";
+        document.getElementById('edit-section').style.display = 'none';
 
-    document.getElementById("results-container").innerHTML="";
-    document.getElementById("edit-section").style.display="none";
-
-    const res=await request({
-        action:"search",
-        query:q
-    });
-
-    document.getElementById("search-status").textContent="";
-
-    if(res.success){
-
-        currentSearchResults=res.data;
-
-        if(res.data.length>0){
-
-            renderTable(res.data);
-
-            document.getElementById("edit-section").style.display=
-                "block";
-
-        }else{
-
-            document.getElementById("results-container").innerHTML=
-                `<p class="hint">${translations[currentLang].notFound}</p>`;
-        }
-
-    }else{
-        alert("Ошибка: "+res.error);
+        const res = await request({action: 'search', query: q});
+        document.getElementById('search-status').innerText = "";
+        
+        if(res.success) {
+            currentSearchResults = res.data;
+            if(res.data.length > 0) {
+                renderTable(res.data);
+                document.getElementById('edit-section').style.display = 'block';
+            } else {
+                document.getElementById('results-container').innerHTML = `<p class='hint'>${translations[currentLang].notFound}</p>`;
+            }
+        } else alert("Ошибка: " + res.error);
     }
-}
 
-/* =========================================================
-   ТАБЛИЦА РЕЗУЛЬТАТОВ
-   ========================================================= */
-
-function renderTable(data){
-
-    let html=`
-        <table>
+    function renderTable(data) {
+        let html = `<table>
             <tr>
                 <th>Panel_pn</th>
                 <th>DATA</th>
                 <th>PN</th>
                 <th>Location</th>
                 <th>info</th>
-            </tr>
-    `;
-
-    data.forEach(row=>{
-
-        html+=`
-            <tr>
-                <td>${escapeHtml(row.panel_pn)}</td>
-                <td>${escapeHtml(row.data)}</td>
-                <td>${escapeHtml(row.pn)}</td>
-                <td>${escapeHtml(row.location)}</td>
-                <td>${escapeHtml(row.info)}</td>
-            </tr>
-        `;
-    });
-
-    html+="</table>";
-
-    document.getElementById("results-container").innerHTML=html;
-}
-
-/* =========================================================
-   ОБНОВЛЕНИЕ
-   ========================================================= */
-
-async function updateBulk(){
-
-    if(currentSearchResults.length===0){
-        return;
+            </tr>`;
+        data.forEach(row => {
+            html += `<tr>
+                <td>${row.panel_pn}</td>
+                <td>${row.data}</td>
+                <td>${row.pn}</td>
+                <td>${row.location}</td>
+                <td>${row.info}</td>
+            </tr>`;
+        });
+        html += "</table>";
+        document.getElementById('results-container').innerHTML = html;
     }
 
-    const rowNumbers=
-        currentSearchResults.map(row=>row.rowNumber);
+    async function updateBulk() {
+        if(currentSearchResults.length === 0) return;
+        
+        const rowNumbers = currentSearchResults.map(r => r.rowNumber);
+        const newData = document.getElementById('edit-data').value;
+        const newLocation = document.getElementById('edit-location').value;
+        const newInfo = document.getElementById('edit-info').value;
 
-    const newData=
-        document.getElementById("edit-data").value;
+        if(!newData && !newLocation && !newInfo) return alert(translations[currentLang].errFillOne);
+        if(!confirm(translations[currentLang].confirmUpdate(rowNumbers.length))) return;
 
-    const newLocation=
-        document.getElementById("edit-location").value.trim();
-
-    const newInfo=
-        document.getElementById("edit-info").value;
-
-    if(!newData&&!newLocation&&!newInfo){
-        alert(translations[currentLang].errFillOne);
-        return;
-    }
-
-    if(!confirm(
-        translations[currentLang]
-        .confirmUpdate(rowNumbers.length)
-    )){
-        return;
-    }
-
-    document.getElementById("search-status").textContent=
-        translations[currentLang].statusUpdate;
-
-    const res=await request({
-        action:"updateBulk",
-        rowNumbers:rowNumbers,
-        data:newData,
-        location:newLocation,
-        info:newInfo
-    });
-
-    document.getElementById("search-status").textContent="";
-
-    if(res.success){
-
-        /*
-         * ==================================================
-         * ДАННЫЕ ДЛЯ ЭТИКЕТКИ
-         * ==================================================
-         *
-         * Берём PN из ПЕРВОЙ найденной строки.
-         *
-         * Если новое значение введено —
-         * используем его.
-         *
-         * Если поле оставили пустым —
-         * используем старое значение.
-         */
-
-        const firstRow=currentSearchResults[0];
-
-        const printData=
-            newData || firstRow.data || "";
-
-        const printPn=
-            firstRow.pn || "";
-
-        const printLocation=
-            newLocation || firstRow.location || "";
-
-        /*
-         * Обновляем Google Sheets,
-         * затем печатаем РОВНО 2 этикетки.
-         */
-        printLabels(
-            printData,
-            printPn,
-            printLocation
-        );
-
-        /*
-         * Очищаем поля редактирования.
-         */
-        document.getElementById("edit-data").value="";
-        document.getElementById("edit-location").value="";
-        document.getElementById("edit-info").value="";
-
-        /*
-         * Обновляем таблицу после изменения.
-         */
-        setTimeout(()=>{
-            searchData();
-        },700);
-
-        setTimeout(()=>{
+        document.getElementById('search-status').innerText = translations[currentLang].statusUpdate;
+        
+        const res = await request({
+            action: 'updateBulk',
+            rowNumbers: rowNumbers,
+            data: newData,
+            location: newLocation,
+            info: newInfo
+        });
+        
+        document.getElementById('search-status').innerText = "";
+        
+        if(res.success) {
             alert(res.message);
-        },500);
-
-    }else{
-        alert("Ошибка: "+res.error);
+            document.getElementById('edit-data').value = "";
+            document.getElementById('edit-location').value = "";
+            document.getElementById('edit-info').value = "";
+            searchData(); 
+        } else alert("Ошибка: " + res.error);
     }
+
+
+/* ===== АВТОЗАПУСК АНИМАЦИИ РАЗ В 3 МИНУТЫ ===== */
+const CARTOON_INTERVAL = 3 * 60 * 1000;
+const CARTOON_DURATION = 17000;
+
+function runCartoonAnimation(){
+    const animation = document.getElementById('cartoon-animation');
+    if(!animation) return;
+
+    animation.classList.remove('show');
+    void animation.offsetWidth;
+    animation.classList.add('show');
+
+    setTimeout(()=>{
+        animation.classList.remove('show');
+    }, CARTOON_DURATION);
 }
+
+setInterval(runCartoonAnimation, CARTOON_INTERVAL);
+
 </script>
+
+
+<!-- МУЛЬТЯШНАЯ АНИМАЦИЯ: автоматически раз в 3 минуты -->
+<div id="cartoon-animation" aria-hidden="true">
+    <svg viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg">
+        <rect width="900" height="150" fill="#111827"/>
+        <line x1="0" y1="124" x2="900" y2="124" class="cartoon-ground"/>
+        <text x="450" y="22" text-anchor="middle" class="cartoon-text cartoon-title">БЕГ НАПЕРЕГОНКИ</text>
+
+        <!-- Барт -->
+        <g class="cartoon-bart">
+            <ellipse cx="150" cy="73" rx="20" ry="24" fill="#f6d84b"/>
+            <path d="M130 61 L118 49 L130 51 L121 40 L137 48 L132 36 L145 48 L151 34 L156 49 L166 38 L165 53 L177 47 L170 60 Z" fill="#e67e22"/>
+            <circle cx="143" cy="70" r="3.5" fill="#111"/>
+            <circle cx="157" cy="70" r="3.5" fill="#111"/>
+            <path d="M143 84 Q150 88 158 84" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+            <path d="M137 94 L127 116" stroke="#f6d84b" stroke-width="8" stroke-linecap="round"/>
+            <path d="M163 94 L176 116" stroke="#f6d84b" stroke-width="8" stroke-linecap="round"/>
+            <path d="M136 97 L113 86" stroke="#f6d84b" stroke-width="7" stroke-linecap="round"/>
+            <path d="M164 97 L184 84" stroke="#f6d84b" stroke-width="7" stroke-linecap="round"/>
+            <rect x="136" y="88" width="28" height="10" rx="3" fill="#179447"/>
+        </g>
+
+        <!-- Гомер -->
+        <g class="cartoon-homer">
+            <ellipse cx="280" cy="72" rx="24" ry="27" fill="#f6d84b"/>
+            <path d="M261 55 Q265 33 280 38 Q295 33 300 55" fill="#f6d84b"/>
+            <circle cx="271" cy="68" r="4" fill="#111"/>
+            <circle cx="287" cy="68" r="4" fill="#111"/>
+            <path d="M269 83 Q280 90 291 83" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+            <path d="M268 97 L255 119" stroke="#f6d84b" stroke-width="10" stroke-linecap="round"/>
+            <path d="M291 97 L305 119" stroke="#f6d84b" stroke-width="10" stroke-linecap="round"/>
+            <path d="M265 99 L238 91" stroke="#f6d84b" stroke-width="9" stroke-linecap="round"/>
+            <path d="M294 99 L318 88" stroke="#f6d84b" stroke-width="9" stroke-linecap="round"/>
+            <rect x="263" y="91" width="29" height="11" rx="3" fill="#5b4a2f"/>
+        </g>
+
+        <!-- Комичная сцена захвата -->
+        <g class="cartoon-grab">
+            <path d="M315 77 Q300 59 279 78" fill="none" stroke="#f6d84b" stroke-width="10" stroke-linecap="round"/>
+            <text x="315" y="57" class="cartoon-text">ОЙ!</text>
+        </g>
+
+        <!-- Мультяшный пистолет у Барта -->
+        <g class="cartoon-gun">
+            <rect x="205" y="79" width="30" height="8" rx="3" fill="#374151"/>
+            <rect x="226" y="75" width="17" height="6" rx="2" fill="#111827"/>
+            <path d="M213 87 L223 101 L231 98 L226 84 Z" fill="#374151"/>
+            <circle cx="234" cy="78" r="2" fill="#f59e0b"/>
+        </g>
+    </svg>
+</div>
 
 </body>
 </html>
