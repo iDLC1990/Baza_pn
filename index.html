@@ -215,13 +215,8 @@ tr:hover{
 /*
  * ЭТИКЕТКА 130 × 76 мм
  *
- * Главное исправление:
- * - внутренние отступы уменьшены;
- * - текст НЕ обрезается;
- * - длинные PN / LOCATION могут переноситься;
- * - содержимое ограничено реальной шириной этикетки;
- * - штрихкод уменьшен по высоте, чтобы DATA/PN/LOCATION
- *   не попадали за пределы этикетки.
+ * Текст начинается ровно через 20 мм от левого края.
+ * Штрихкод остаётся по центру этикетки, как было изначально.
  */
 .print-label{
     width:130mm;
@@ -229,39 +224,37 @@ tr:hover{
     background:#fff;
     color:#000;
     font-family:Arial,Helvetica,sans-serif;
-    padding:4mm 5mm;
+
+    /* Слева РОВНО 20 мм */
+    padding:5mm 7mm 5mm 20mm;
+
     box-sizing:border-box;
     overflow:hidden;
     page-break-after:always;
     break-after:page;
-
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
 }
 
 .print-block{
     width:100%;
-    max-width:100%;
-    margin-bottom:2.5mm;
-    flex:0 0 auto;
+    max-width:103mm;
+    margin-bottom:3mm;
 }
 
 .print-title{
-    font-size:8pt;
+    font-size:10pt;
     font-weight:900;
     line-height:1;
-    margin-bottom:1mm;
+    margin-bottom:1.5mm;
 }
 
 .print-value{
     width:100%;
-    max-width:100%;
-    font-size:14pt;
+    max-width:103mm;
+    font-size:16pt;
     font-weight:900;
-    line-height:1.05;
+    line-height:1.1;
 
-    /* Не прячем длинный текст за границей блока */
+    /* Длинный текст не обрезаем */
     white-space:normal;
     overflow:visible;
     text-overflow:clip;
@@ -272,11 +265,9 @@ tr:hover{
 .print-barcode{
     display:block;
     width:110mm !important;
-    max-width:100% !important;
-    height:18mm !important;
-    max-height:18mm !important;
-    margin:2.5mm auto 0;
-    flex:0 0 auto;
+    max-width:110mm !important;
+    height:22mm !important;
+    margin:6mm auto 0;
 }
 
 @page{
@@ -296,7 +287,6 @@ tr:hover{
         width:130mm !important;
         min-width:130mm !important;
         max-width:130mm !important;
-        height:auto !important;
         margin:0 !important;
         padding:0 !important;
         background:#fff !important;
@@ -322,14 +312,14 @@ tr:hover{
     }
 
     .print-label{
-        display:flex !important;
-        flex-direction:column !important;
+        display:block !important;
         width:130mm !important;
         height:76mm !important;
-        min-width:130mm !important;
-        max-width:130mm !important;
         margin:0 !important;
-        padding:4mm 5mm !important;
+
+        /* В печати тоже оставляем 20 мм слева */
+        padding:5mm 7mm 5mm 20mm !important;
+
         box-sizing:border-box !important;
         page-break-after:always !important;
         break-after:page !important;
@@ -338,7 +328,7 @@ tr:hover{
 
     .print-block,
     .print-value{
-        max-width:100% !important;
+        max-width:103mm !important;
         box-sizing:border-box !important;
     }
 
@@ -350,9 +340,9 @@ tr:hover{
     }
 
     .print-barcode{
-        max-width:100% !important;
-        height:18mm !important;
-        max-height:18mm !important;
+        width:110mm !important;
+        max-width:110mm !important;
+        height:22mm !important;
     }
 }
 
@@ -1153,13 +1143,41 @@ function printLabels(
             "print-area"
         );
 
+
     /*
-     * DATA всегда печатаем как DATE.
-     * Формат: DD.MM.YYYY.
+     * ДАТА
+     *
+     * Берём дату из DATA.
+     * Если DATA пустая — используем текущую дату.
      */
+    let dateValue = data;
+
+    if(!dateValue){
+
+        const now = new Date();
+
+        const year =
+            now.getFullYear();
+
+        const month =
+            String(
+                now.getMonth() + 1
+            ).padStart(2,"0");
+
+        const day =
+            String(
+                now.getDate()
+            ).padStart(2,"0");
+
+        dateValue =
+            `${year}-${month}-${day}`;
+
+    }
+
+
     const dateText =
         escapeHtml(
-            formatDate(data)
+            formatDate(dateValue)
         );
 
     const pnText =
@@ -1168,17 +1186,15 @@ function printLabels(
     const locationText =
         escapeHtml(location);
 
+
     /*
      * Одна готовая этикетка.
      *
-     * Порядок:
-     * DATE
-     * PN
-     * LOCATION
-     * BARCODE
+     * Сохраняем старое расположение:
+     * сверху DATA / PN / LOCATION,
+     * снизу по центру штрихкод.
      *
-     * Весь текст находится внутри внутренней ширины
-     * этикетки и не скрывается через overflow:hidden.
+     * Добавили только DATE.
      */
     const label = `
 
@@ -1231,7 +1247,7 @@ function printLabels(
 
 
     /*
-     * Всегда печатаем ровно 2 одинаковые этикетки.
+     * Всегда только 2 одинаковые этикетки.
      */
     area.innerHTML =
         label + label;
@@ -1259,7 +1275,7 @@ function printLabels(
 
                 width:2,
 
-                height:55,
+                height:70,
 
                 margin:0,
 
@@ -1274,12 +1290,8 @@ function printLabels(
 
 
     /*
-     * Если PN или LOCATION очень длинные,
-     * автоматически уменьшаем шрифт до тех пор,
-     * пока текст гарантированно помещается
-     * по ширине этикетки.
-     *
-     * Текст никогда не скрывается.
+     * Если PN или LOCATION слишком длинные,
+     * уменьшаем шрифт, но НЕ обрезаем текст.
      */
     area
         .querySelectorAll(".print-value")
@@ -1312,7 +1324,7 @@ function printLabels(
 
 
     /*
-     * Даём SVG и тексту время отрисоваться.
+     * Даём браузеру время отрисовать SVG.
      */
     setTimeout(() => {
 
