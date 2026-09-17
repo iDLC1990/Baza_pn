@@ -205,7 +205,8 @@ tr:hover{
 
 /* =========================================================
    ЭТИКЕТКА
-   НОВЫЙ РАЗМЕР: 130 × 76 мм
+   РАЗМЕР: 130 × 76 мм
+   Отступ сверху и слева: 20 мм
    ========================================================= */
 
 #print-area{
@@ -215,7 +216,8 @@ tr:hover{
 /*
  * ЭТИКЕТКА 130 × 76 мм
  *
- * Текст начинается ровно через 20 мм от левого края.
+ * Текст начинается через 20 мм от левого края
+ * и 20 мм от верхнего края.
  * Штрихкод остаётся по центру этикетки, как было изначально.
  */
 .print-label{
@@ -225,8 +227,8 @@ tr:hover{
     color:#000;
     font-family:Arial,Helvetica,sans-serif;
 
-    /* Слева РОВНО 20 мм */
-    padding:5mm 7mm 5mm 20mm;
+    /* Сверху 20 мм, слева 20 мм */
+    padding:20mm 7mm 5mm 20mm;
 
     box-sizing:border-box;
     overflow:hidden;
@@ -317,8 +319,8 @@ tr:hover{
         height:76mm !important;
         margin:0 !important;
 
-        /* В печати тоже оставляем 20 мм слева */
-        padding:5mm 7mm 5mm 20mm !important;
+        /* В печати тоже 20 мм сверху и слева */
+        padding:20mm 7mm 5mm 20mm !important;
 
         box-sizing:border-box !important;
         page-break-after:always !important;
