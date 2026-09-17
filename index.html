@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -33,6 +34,8 @@ th,td{border:1px solid #2c4152;padding:5px 8px;text-align:center}
 th{background:#177a7d;font-weight:bold;color:#fff;text-transform:uppercase}
 tr:nth-child(even){background:#18232e}
 tr:hover{background:#1f2e3d}
+.print-icon-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:.2s}
+.print-icon-btn:hover{background:rgba(45,186,177,.2)}
 .loading{font-size:11px;color:#2dbab1;margin-top:5px;font-weight:bold}
 #edit-section{background:#121922;border:1px solid #2c4152;padding:10px;border-radius:4px;margin:10px 0}
 .hint{font-size:10px;color:#6b8296;margin:0 0 8px}
@@ -280,12 +283,18 @@ showToast("Ошибка: " + res.error,"error");
 }
 }
 function renderTable(data){
-let html = `<table><tr><th>Panel_pn</th><th>DATA</th><th>PN</th><th>Location</th><th>info</th></tr>`;
-data.forEach(row=>{
-html += `<tr><td>${escapeHtml(row.panel_pn)}</td><td>${escapeHtml(row.data)}</td><td>${escapeHtml(row.pn)}</td><td>${escapeHtml(row.location)}</td><td>${escapeHtml(row.info)}</td></tr>`;
+let html = `<table><tr><th></th><th>Panel_pn</th><th>DATA</th><th>PN</th><th>Location</th><th>info</th></tr>`;
+data.forEach((row,index)=>{
+const printCell = index === 0 ? `<td><button class="print-icon-btn" onclick="printRow(0)" title="Печать этикетки">🖨️</button></td>` : `<td></td>`;
+html += `<tr>${printCell}<td>${escapeHtml(row.panel_pn)}</td><td>${escapeHtml(row.data)}</td><td>${escapeHtml(row.pn)}</td><td>${escapeHtml(row.location)}</td><td>${escapeHtml(row.info)}</td></tr>`;
 });
 html += "</table>";
 document.getElementById("results-container").innerHTML = html;
+}
+function printRow(index){
+const row = currentSearchResults[index];
+if(!row) return;
+printLabels(row.data,row.pn,row.location);
 }
 async function updateBulk(){
 if(currentSearchResults.length === 0) return;
