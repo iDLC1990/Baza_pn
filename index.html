@@ -1,13 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>База данных деталей</title>
+
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+    box-sizing:border-box;
+}
+
 body{
     font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
     background:#080d12;
@@ -17,6 +24,7 @@ body{
     padding:15px;
     min-height:100vh;
 }
+
 .container{
     max-width:1000px;
     margin:0 auto;
@@ -24,12 +32,14 @@ body{
     flex-direction:column;
     gap:15px;
 }
+
 .lang-switcher{
     display:flex;
     justify-content:flex-end;
     gap:8px;
     margin-bottom:-5px;
 }
+
 .lang-flag{
     cursor:pointer;
     font-size:20px;
@@ -40,14 +50,17 @@ body{
     transition:.2s;
     line-height:1;
 }
+
 .lang-flag:hover{
     transform:scale(1.1);
     border-color:#2dbab1;
 }
+
 .lang-flag.active{
     border-color:#2dbab1;
     box-shadow:0 0 5px rgba(45,186,177,.5);
 }
+
 .card{
     background:rgba(25,35,45,.9);
     border:1px solid #145e61;
@@ -55,6 +68,7 @@ body{
     padding:15px;
     box-shadow:0 4px 15px rgba(0,0,0,.6);
 }
+
 h2,h3{
     margin:0 0 10px;
     color:#2dbab1;
@@ -62,18 +76,21 @@ h2,h3{
     text-transform:uppercase;
     letter-spacing:1px;
 }
+
 .form-row{
     display:flex;
     gap:10px;
     flex-wrap:wrap;
     margin-bottom:10px;
 }
+
 .form-group{
     flex:1;
     min-width:130px;
     display:flex;
     flex-direction:column;
 }
+
 label{
     font-size:10px;
     font-weight:bold;
@@ -81,7 +98,9 @@ label{
     color:#8da4b5;
     text-transform:uppercase;
 }
-input,textarea{
+
+input,
+textarea{
     padding:6px 8px;
     background:#121922;
     border:1px solid #2c4152;
@@ -91,12 +110,18 @@ input,textarea{
     font-family:inherit;
     transition:.2s;
 }
-input:focus,textarea:focus{
+
+input:focus,
+textarea:focus{
     outline:none;
     border-color:#2dbab1;
     box-shadow:0 0 0 1px #2dbab1;
 }
-textarea{resize:vertical}
+
+textarea{
+    resize:vertical;
+}
+
 .btn{
     padding:8px 12px;
     border:none;
@@ -108,14 +133,25 @@ textarea{resize:vertical}
     text-transform:uppercase;
     transition:.2s;
 }
-.btn-blue{background:#177a7d}
-.btn-blue:hover{background:#2dbab1}
+
+.btn-blue{
+    background:#177a7d;
+}
+
+.btn-blue:hover{
+    background:#2dbab1;
+}
+
 .btn-green{
     background:#145e61;
     margin-top:5px;
     width:100%;
 }
-.btn-green:hover{background:#177a7d}
+
+.btn-green:hover{
+    background:#177a7d;
+}
+
 table{
     width:100%;
     border-collapse:collapse;
@@ -123,25 +159,36 @@ table{
     font-size:11px;
     background:#121922;
 }
-th,td{
+
+th,
+td{
     border:1px solid #2c4152;
     padding:5px 8px;
     text-align:center;
 }
+
 th{
     background:#177a7d;
     font-weight:bold;
     color:#fff;
     text-transform:uppercase;
 }
-tr:nth-child(even){background:#18232e}
-tr:hover{background:#1f2e3d}
+
+tr:nth-child(even){
+    background:#18232e;
+}
+
+tr:hover{
+    background:#1f2e3d;
+}
+
 .loading{
     font-size:11px;
     color:#2dbab1;
     margin-top:5px;
     font-weight:bold;
 }
+
 #edit-section{
     background:#121922;
     border:1px solid #2c4152;
@@ -149,14 +196,22 @@ tr:hover{background:#1f2e3d}
     border-radius:4px;
     margin:10px 0;
 }
+
 .hint{
     font-size:10px;
     color:#6b8296;
     margin:0 0 8px;
 }
 
-/* ===== ЭТИКЕТКА ===== */
-#print-area{display:none}
+
+/* =========================================================
+   ЭТИКЕТКА
+   НОВЫЙ РАЗМЕР: 130 × 76 мм
+   ========================================================= */
+
+#print-area{
+    display:none;
+}
 
 .print-label{
     width:130mm;
@@ -193,7 +248,7 @@ tr:hover{background:#1f2e3d}
 
 .print-barcode{
     display:block;
-    width:86mm !important;
+    width:110mm !important;
     height:22mm !important;
     margin:6mm auto 0;
 }
@@ -203,10 +258,17 @@ tr:hover{background:#1f2e3d}
     margin:0;
 }
 
+
+/* =========================================================
+   ПЕЧАТЬ
+   ========================================================= */
+
 @media print{
-    html,body{
-        width:100mm !important;
-        min-width:100mm !important;
+
+    html,
+    body{
+        width:130mm !important;
+        min-width:130mm !important;
         margin:0 !important;
         padding:0 !important;
         background:#fff !important;
@@ -226,7 +288,7 @@ tr:hover{background:#1f2e3d}
         position:absolute !important;
         left:0 !important;
         top:0 !important;
-        width:100mm !important;
+        width:130mm !important;
         margin:0 !important;
         padding:0 !important;
     }
@@ -243,26 +305,60 @@ tr:hover{background:#1f2e3d}
         overflow:hidden !important;
     }
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="container">
 
+
     <!-- ЯЗЫК -->
+
     <div class="lang-switcher">
-        <span class="lang-flag" onclick="setLanguage('ru',this)" title="Русский">🇷🇺</span>
-        <span class="lang-flag" onclick="setLanguage('uk',this)" title="Українська">🇺🇦</span>
-        <span class="lang-flag" onclick="setLanguage('pl',this)" title="Polski">🇵🇱</span>
-        <span class="lang-flag" onclick="setLanguage('en',this)" title="English">🇬🇧</span>
+
+        <span
+            class="lang-flag"
+            onclick="setLanguage('ru',this)"
+            title="Русский"
+        >🇷🇺</span>
+
+        <span
+            class="lang-flag"
+            onclick="setLanguage('uk',this)"
+            title="Українська"
+        >🇺🇦</span>
+
+        <span
+            class="lang-flag"
+            onclick="setLanguage('pl',this)"
+            title="Polski"
+        >🇵🇱</span>
+
+        <span
+            class="lang-flag"
+            onclick="setLanguage('en',this)"
+            title="English"
+        >🇬🇧</span>
+
     </div>
 
-    <!-- ДОБАВЛЕНИЕ -->
-    <div class="card">
-        <h2 data-i18n="addTitle">Массовое добавление</h2>
 
-        <div class="form-group" style="margin-bottom:10px">
+    <!-- ДОБАВЛЕНИЕ -->
+
+    <div class="card">
+
+        <h2 data-i18n="addTitle">
+            Массовое добавление
+        </h2>
+
+        <div
+            class="form-group"
+            style="margin-bottom:10px"
+        >
+
             <label data-i18n="labelPanelPn">
                 Panel_pn (Список с новой строки)
             </label>
@@ -272,31 +368,72 @@ tr:hover{background:#1f2e3d}
                 rows="3"
                 placeholder="750TBV500S74HHN000&#10;750TBV500S78AHN000..."
             ></textarea>
+
         </div>
+
 
         <div class="form-row">
 
             <div class="form-group">
-                <label data-i18n="labelData">DATA</label>
-                <input type="date" id="add-data">
+
+                <label data-i18n="labelData">
+                    DATA
+                </label>
+
+                <input
+                    type="date"
+                    id="add-data"
+                >
+
             </div>
 
-            <div class="form-group">
-                <label data-i18n="labelPn">PN</label>
-                <input type="text" id="add-pn" placeholder="Например: 203BYQ...">
-            </div>
 
             <div class="form-group">
-                <label data-i18n="labelLocation">Location</label>
-                <input type="text" id="add-location" placeholder="KUWETA 666">
+
+                <label data-i18n="labelPn">
+                    PN
+                </label>
+
+                <input
+                    type="text"
+                    id="add-pn"
+                    placeholder="Например: 203BYQ..."
+                >
+
             </div>
 
+
             <div class="form-group">
-                <label data-i18n="labelInfo">info</label>
-                <input type="text" id="add-info" placeholder="DIFF PLATE 50">
+
+                <label data-i18n="labelLocation">
+                    Location
+                </label>
+
+                <input
+                    type="text"
+                    id="add-location"
+                    placeholder="KUWETA 666"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label data-i18n="labelInfo">
+                    info
+                </label>
+
+                <input
+                    type="text"
+                    id="add-info"
+                    placeholder="DIFF PLATE 50"
+                >
+
             </div>
 
         </div>
+
 
         <button
             class="btn btn-blue"
@@ -306,17 +443,28 @@ tr:hover{background:#1f2e3d}
             + Добавить список
         </button>
 
-        <div id="add-status" class="loading"></div>
+
+        <div
+            id="add-status"
+            class="loading"
+        ></div>
+
     </div>
 
+
     <!-- ПОИСК -->
+
     <div class="card">
 
         <h2 data-i18n="searchTitle">
             Поиск и Редактирование
         </h2>
 
-        <div class="form-row" style="margin-bottom:5px">
+
+        <div
+            class="form-row"
+            style="margin-bottom:5px"
+        >
 
             <input
                 type="text"
@@ -325,6 +473,7 @@ tr:hover{background:#1f2e3d}
                 placeholder="Введите PN или Panel_pn"
                 data-i18n-placeholder="searchPlaceholder"
             >
+
 
             <button
                 class="btn btn-blue"
@@ -337,43 +486,78 @@ tr:hover{background:#1f2e3d}
 
         </div>
 
-        <div id="search-status" class="loading"></div>
+
+        <div
+            id="search-status"
+            class="loading"
+        ></div>
+
 
         <!-- РЕДАКТИРОВАНИЕ -->
-        <div id="edit-section" style="display:none">
+
+        <div
+            id="edit-section"
+            style="display:none"
+        >
 
             <h3 data-i18n="editTitle">
                 Изменить найденные строки
             </h3>
 
-            <p class="hint" data-i18n="editHint">
+
+            <p
+                class="hint"
+                data-i18n="editHint"
+            >
                 Оставьте поле пустым, если не хотите его менять.
             </p>
+
 
             <div class="form-row">
 
                 <div class="form-group">
+
                     <label data-i18n="labelNewData">
                         Новая Дата
                     </label>
-                    <input type="date" id="edit-data">
+
+                    <input
+                        type="date"
+                        id="edit-data"
+                    >
+
                 </div>
 
+
                 <div class="form-group">
+
                     <label data-i18n="labelNewLocation">
                         Новая Локация
                     </label>
-                    <input type="text" id="edit-location">
+
+                    <input
+                        type="text"
+                        id="edit-location"
+                    >
+
                 </div>
 
+
                 <div class="form-group">
+
                     <label data-i18n="labelNewInfo">
                         Новое info
                     </label>
-                    <input type="text" id="edit-info">
+
+                    <input
+                        type="text"
+                        id="edit-info"
+                    >
+
                 </div>
 
             </div>
+
 
             <button
                 class="btn btn-green"
@@ -385,306 +569,688 @@ tr:hover{background:#1f2e3d}
 
         </div>
 
+
         <div style="overflow-x:auto">
+
             <div id="results-container"></div>
+
         </div>
 
     </div>
+
 </div>
 
+
 <!-- ОБЛАСТЬ ПЕЧАТИ -->
+
 <div id="print-area"></div>
 
+
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOnMILNgecMKkefI7P81pSR4hxiLQXIa9rirL8LCM7s0AzT/exec";
 
-let currentSearchResults=[];
-let currentLang=localStorage.getItem("site_lang")||"ru";
 
-/* ===== ПЕРЕВОДЫ ===== */
+/* =========================================================
+   API
+   ========================================================= */
 
-const translations={
-    ru:{
+const API_URL =
+"https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOnMILNgecMKkefI7P81pSR4hxiLQXIa9rirL8LCM7s0AzT/exec";
+
+
+let currentSearchResults = [];
+
+let currentLang =
+    localStorage.getItem("site_lang") || "ru";
+
+
+/* =========================================================
+   ПЕРЕВОДЫ
+   ========================================================= */
+
+const translations = {
+
+    ru: {
+
         addTitle:"Массовое добавление",
-        labelPanelPn:"Panel_pn (Список с новой строки)",
+
+        labelPanelPn:
+            "Panel_pn (Список с новой строки)",
+
         labelData:"DATA",
+
         labelPn:"PN",
+
         labelLocation:"Location",
+
         labelInfo:"info",
+
         btnAdd:"+ Добавить список",
-        searchTitle:"Поиск и Редактирование",
-        searchPlaceholder:"Введите PN или Panel_pn",
+
+        searchTitle:
+            "Поиск и Редактирование",
+
+        searchPlaceholder:
+            "Введите PN или Panel_pn",
+
         btnSearch:"Найти",
-        editTitle:"Изменить найденные строки",
-        editHint:"Оставьте поле пустым, если не хотите его менять.",
-        labelNewData:"Новая Дата",
-        labelNewLocation:"Новая Локация",
-        labelNewInfo:"Новое info",
-        btnUpdate:"Применить изменения",
-        statusRecord:"Запись...",
-        statusSearch:"Поиск...",
-        statusUpdate:"Обновление...",
-        notFound:"Ничего не найдено.",
-        errEnterPn:"Введите хотя бы один Panel_pn",
-        errEnterQuery:"Введите запрос",
-        errFillOne:"Заполните хотя бы одно поле!",
-        confirmUpdate:c=>`Обновить ${c} строк?`
+
+        editTitle:
+            "Изменить найденные строки",
+
+        editHint:
+            "Оставьте поле пустым, если не хотите его менять.",
+
+        labelNewData:
+            "Новая Дата",
+
+        labelNewLocation:
+            "Новая Локация",
+
+        labelNewInfo:
+            "Новое info",
+
+        btnUpdate:
+            "Применить изменения",
+
+        statusRecord:
+            "Запись...",
+
+        statusSearch:
+            "Поиск...",
+
+        statusUpdate:
+            "Обновление...",
+
+        notFound:
+            "Ничего не найдено.",
+
+        errEnterPn:
+            "Введите хотя бы один Panel_pn",
+
+        errEnterQuery:
+            "Введите запрос",
+
+        errFillOne:
+            "Заполните хотя бы одно поле!",
+
+        confirmUpdate:
+            c => `Обновить ${c} строк?`
     },
 
-    uk:{
+
+    uk: {
+
         addTitle:"Масове додавання",
-        labelPanelPn:"Panel_pn (Список з нового рядка)",
+
+        labelPanelPn:
+            "Panel_pn (Список з нового рядка)",
+
         labelData:"DATA",
+
         labelPn:"PN",
+
         labelLocation:"Location",
+
         labelInfo:"info",
+
         btnAdd:"+ Додати список",
-        searchTitle:"Пошук та Редагування",
-        searchPlaceholder:"Введіть PN або Panel_pn",
+
+        searchTitle:
+            "Пошук та Редагування",
+
+        searchPlaceholder:
+            "Введіть PN або Panel_pn",
+
         btnSearch:"Знайти",
-        editTitle:"Змінити знайдені рядки",
-        editHint:"Залиште поле порожнім, якщо не хочете його змінювати.",
-        labelNewData:"Нова Дата",
-        labelNewLocation:"Нова Локація",
-        labelNewInfo:"Нове info",
-        btnUpdate:"Застосувати зміни",
-        statusRecord:"Запис...",
-        statusSearch:"Пошук...",
-        statusUpdate:"Оновлення...",
-        notFound:"Нічого не знайдено.",
-        errEnterPn:"Введіть хоча б один Panel_pn",
-        errEnterQuery:"Введіть запит",
-        errFillOne:"Заповніть хоча б одне поле!",
-        confirmUpdate:c=>`Оновити ${c} рядків?`
+
+        editTitle:
+            "Змінити знайдені рядки",
+
+        editHint:
+            "Залиште поле порожнім, якщо не хочете його змінювати.",
+
+        labelNewData:
+            "Нова Дата",
+
+        labelNewLocation:
+            "Нова Локація",
+
+        labelNewInfo:
+            "Нове info",
+
+        btnUpdate:
+            "Застосувати зміни",
+
+        statusRecord:
+            "Запис...",
+
+        statusSearch:
+            "Пошук...",
+
+        statusUpdate:
+            "Оновлення...",
+
+        notFound:
+            "Нічого не знайдено.",
+
+        errEnterPn:
+            "Введіть хоча б один Panel_pn",
+
+        errEnterQuery:
+            "Введіть запит",
+
+        errFillOne:
+            "Заповніть хоча б одне поле!",
+
+        confirmUpdate:
+            c => `Оновити ${c} рядків?`
     },
 
-    pl:{
+
+    pl: {
+
         addTitle:"Masowe dodawanie",
-        labelPanelPn:"Panel_pn (Lista z nowej linii)",
+
+        labelPanelPn:
+            "Panel_pn (Lista z nowej linii)",
+
         labelData:"DATA",
+
         labelPn:"PN",
+
         labelLocation:"Location",
+
         labelInfo:"info",
+
         btnAdd:"+ Dodaj listę",
-        searchTitle:"Wyszukiwanie i Edycja",
-        searchPlaceholder:"Wpisz PN lub Panel_pn",
+
+        searchTitle:
+            "Wyszukiwanie i Edycja",
+
+        searchPlaceholder:
+            "Wpisz PN lub Panel_pn",
+
         btnSearch:"Szukaj",
-        editTitle:"Edytuj znalezione wiersze",
-        editHint:"Pozostaw pole puste, jeśli chcesz je pominąć.",
-        labelNewData:"Nowa Data",
-        labelNewLocation:"Nowa Lokalizacja",
-        labelNewInfo:"Nowe info",
-        btnUpdate:"Zastosuj zmiany",
-        statusRecord:"Zapisywanie...",
-        statusSearch:"Szukanie...",
-        statusUpdate:"Aktualizacja...",
-        notFound:"Nic nie znaleziono.",
-        errEnterPn:"Wprowadź co najmniej jeden Panel_pn",
-        errEnterQuery:"Wprowadź zapytanie",
-        errFillOne:"Wypełnij co najmniej jedno pole!",
-        confirmUpdate:c=>`Zaktualizować ${c} wierszy?`
+
+        editTitle:
+            "Edytuj znalezione wiersze",
+
+        editHint:
+            "Pozostaw pole puste, jeśli chcesz je pominąć.",
+
+        labelNewData:
+            "Nowa Data",
+
+        labelNewLocation:
+            "Nowa Lokalizacja",
+
+        labelNewInfo:
+            "Nowe info",
+
+        btnUpdate:
+            "Zastosuj zmiany",
+
+        statusRecord:
+            "Zapisywanie...",
+
+        statusSearch:
+            "Szukanie...",
+
+        statusUpdate:
+            "Aktualizacja...",
+
+        notFound:
+            "Nic nie znaleziono.",
+
+        errEnterPn:
+            "Wprowadź co najmniej jeden Panel_pn",
+
+        errEnterQuery:
+            "Wprowadź zapytanie",
+
+        errFillOne:
+            "Wypełnij co najmniej jedno pole!",
+
+        confirmUpdate:
+            c => `Zaktualizować ${c} wierszy?`
     },
 
-    en:{
+
+    en: {
+
         addTitle:"Bulk Add",
-        labelPanelPn:"Panel_pn (List, one per line)",
+
+        labelPanelPn:
+            "Panel_pn (List, one per line)",
+
         labelData:"DATA",
+
         labelPn:"PN",
+
         labelLocation:"Location",
+
         labelInfo:"info",
+
         btnAdd:"+ Add List",
-        searchTitle:"Search & Edit",
-        searchPlaceholder:"Enter PN or Panel_pn",
+
+        searchTitle:
+            "Search & Edit",
+
+        searchPlaceholder:
+            "Enter PN or Panel_pn",
+
         btnSearch:"Search",
-        editTitle:"Edit Found Rows",
-        editHint:"Leave the field empty if you don't want to change it.",
-        labelNewData:"New Date",
-        labelNewLocation:"New Location",
-        labelNewInfo:"New info",
-        btnUpdate:"Apply Changes",
-        statusRecord:"Saving...",
-        statusSearch:"Searching...",
-        statusUpdate:"Updating...",
-        notFound:"Nothing found.",
-        errEnterPn:"Enter at least one Panel_pn",
-        errEnterQuery:"Enter search query",
-        errFillOne:"Fill out at least one field!",
-        confirmUpdate:c=>`Update ${c} rows?`
+
+        editTitle:
+            "Edit Found Rows",
+
+        editHint:
+            "Leave the field empty if you don't want to change it.",
+
+        labelNewData:
+            "New Date",
+
+        labelNewLocation:
+            "New Location",
+
+        labelNewInfo:
+            "New info",
+
+        btnUpdate:
+            "Apply Changes",
+
+        statusRecord:
+            "Saving...",
+
+        statusSearch:
+            "Searching...",
+
+        statusUpdate:
+            "Updating...",
+
+        notFound:
+            "Nothing found.",
+
+        errEnterPn:
+            "Enter at least one Panel_pn",
+
+        errEnterQuery:
+            "Enter search query",
+
+        errFillOne:
+            "Fill out at least one field!",
+
+        confirmUpdate:
+            c => `Update ${c} rows?`
     }
+
 };
 
-/* ===== ЯЗЫК ===== */
+
+/* =========================================================
+   ЯЗЫК
+   ========================================================= */
 
 function setLanguage(lang,element){
-    currentLang=lang;
-    localStorage.setItem("site_lang",lang);
 
-    document.querySelectorAll(".lang-flag").forEach(el=>{
-        el.classList.remove("active");
-    });
+    currentLang = lang;
+
+    localStorage.setItem(
+        "site_lang",
+        lang
+    );
+
+
+    document
+        .querySelectorAll(".lang-flag")
+        .forEach(el => {
+
+            el.classList.remove("active");
+
+        });
+
 
     if(element){
+
         element.classList.add("active");
+
     }else{
-        const flags=document.querySelectorAll(".lang-flag");
-        const indexes={ru:0,uk:1,pl:2,en:3};
+
+        const flags =
+            document.querySelectorAll(".lang-flag");
+
+        const indexes = {
+            ru:0,
+            uk:1,
+            pl:2,
+            en:3
+        };
+
         if(flags[indexes[lang]]){
-            flags[indexes[lang]].classList.add("active");
+
+            flags[indexes[lang]]
+                .classList.add("active");
+
         }
+
     }
 
-    document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const key=el.getAttribute("data-i18n");
-        if(translations[lang][key]){
-            el.textContent=translations[lang][key];
-        }
-    });
 
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
-        const key=el.getAttribute("data-i18n-placeholder");
-        if(translations[lang][key]){
-            el.placeholder=translations[lang][key];
-        }
-    });
+    document
+        .querySelectorAll("[data-i18n]")
+        .forEach(el => {
+
+            const key =
+                el.getAttribute("data-i18n");
+
+            if(translations[lang][key]){
+
+                el.textContent =
+                    translations[lang][key];
+
+            }
+
+        });
+
+
+    document
+        .querySelectorAll("[data-i18n-placeholder]")
+        .forEach(el => {
+
+            const key =
+                el.getAttribute(
+                    "data-i18n-placeholder"
+                );
+
+            if(translations[lang][key]){
+
+                el.placeholder =
+                    translations[lang][key];
+
+            }
+
+        });
+
 
     if(currentSearchResults.length){
-        renderTable(currentSearchResults);
+
+        renderTable(
+            currentSearchResults
+        );
+
     }
+
 }
 
-window.addEventListener("DOMContentLoaded",()=>{
-    setLanguage(currentLang);
-});
 
-/* ===== API ===== */
+window.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        setLanguage(currentLang);
+
+    }
+);
+
+
+/* =========================================================
+   API REQUEST
+   ========================================================= */
 
 async function request(payload){
+
     try{
-        const response=await fetch(API_URL,{
-            method:"POST",
-            headers:{
-                "Content-Type":"text/plain;charset=utf-8"
-            },
-            body:JSON.stringify(payload)
-        });
+
+        const response =
+            await fetch(API_URL,{
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+
+                body:
+                    JSON.stringify(payload)
+
+            });
+
 
         return await response.json();
 
+
     }catch(error){
+
         return{
+
             success:false,
+
             error:error.message
+
         };
+
     }
+
 }
 
-/* ===== ЗАЩИТА HTML ===== */
+
+/* =========================================================
+   ЗАЩИТА HTML
+   ========================================================= */
 
 function escapeHtml(value){
-    return String(value??"")
+
+    return String(value ?? "")
         .replace(/&/g,"&amp;")
         .replace(/</g,"&lt;")
         .replace(/>/g,"&gt;")
         .replace(/"/g,"&quot;")
         .replace(/'/g,"&#039;");
+
 }
 
-/* ===== ДАТА ===== */
-
-function formatDate(value){
-    if(!value)return"";
-
-    const text=String(value);
-
-    const match=text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-
-    if(match){
-        return`${match[3]}.${match[2]}.${match[1]}`;
-    }
-
-    return text;
-}
 
 /* =========================================================
-   ПЕЧАТЬ
-   ВСЕГДА РОВНО 2 ОДИНАКОВЫЕ ЭТИКЕТКИ
+   ДАТА
    ========================================================= */
 
-function printLabels(data,pn,location){
+function formatDate(value){
 
-    const area=document.getElementById("print-area");
+    if(!value){
 
-    const dateText=escapeHtml(formatDate(data));
-    const pnText=escapeHtml(pn);
-    const locationText=escapeHtml(location);
+        return "";
+
+    }
+
+
+    const text =
+        String(value);
+
+
+    const match =
+        text.match(
+            /^(\d{4})-(\d{2})-(\d{2})$/
+        );
+
+
+    if(match){
+
+        return `${match[3]}.${match[2]}.${match[1]}`;
+
+    }
+
+
+    return text;
+
+}
+
+
+/* =========================================================
+   ПЕЧАТЬ ЭТИКЕТОК
+   РОВНО 2 ОДИНАКОВЫЕ ЭТИКЕТКИ
+   РАЗМЕР: 130 × 76 мм
+   ========================================================= */
+
+function printLabels(
+    data,
+    pn,
+    location
+){
+
+    const area =
+        document.getElementById(
+            "print-area"
+        );
+
+
+    const dateText =
+        escapeHtml(
+            formatDate(data)
+        );
+
+    const pnText =
+        escapeHtml(pn);
+
+    const locationText =
+        escapeHtml(location);
+
 
     /*
      * Одна готовая этикетка.
-     * Потом она вставляется 2 раза.
      */
-    const label=`
+
+    const label = `
+
         <div class="print-label">
 
             <div class="print-block">
-                <div class="print-title">DATA</div>
-                <div class="print-value">${dateText}</div>
+
+                <div class="print-title">
+                    DATA
+                </div>
+
+                <div class="print-value">
+                    ${dateText}
+                </div>
+
             </div>
 
-            <div class="print-block">
-                <div class="print-title">PN</div>
-                <div class="print-value">${pnText}</div>
-            </div>
 
             <div class="print-block">
-                <div class="print-title">LOCATION</div>
-                <div class="print-value">${locationText}</div>
+
+                <div class="print-title">
+                    PN
+                </div>
+
+                <div class="print-value">
+                    ${pnText}
+                </div>
+
             </div>
+
+
+            <div class="print-block">
+
+                <div class="print-title">
+                    LOCATION
+                </div>
+
+                <div class="print-value">
+                    ${locationText}
+                </div>
+
+            </div>
+
 
             <svg class="print-barcode"></svg>
 
         </div>
+
     `;
+
 
     /*
      * ВАЖНО:
-     * Только 2 этикетки.
-     * Не зависит от количества найденных строк.
+     * Всегда только 2 этикетки.
      */
-    area.innerHTML=label+label;
 
-    const barcodes=area.querySelectorAll(".print-barcode");
+    area.innerHTML =
+        label + label;
 
-    barcodes.forEach(svg=>{
-        JsBarcode(svg,String(pn),{
-            format:"CODE128B",
-            displayValue:false,
-            width:2,
-            height:70,
-            margin:0,
-            lineColor:"#000",
-            background:"#fff"
-        });
+
+    const barcodes =
+        area.querySelectorAll(
+            ".print-barcode"
+        );
+
+
+    barcodes.forEach(svg => {
+
+        JsBarcode(
+            svg,
+            String(pn),
+            {
+
+                format:"CODE128B",
+
+                displayValue:false,
+
+                width:2,
+
+                height:70,
+
+                margin:0,
+
+                lineColor:"#000",
+
+                background:"#fff"
+
+            }
+        );
+
     });
 
-    area.style.display="block";
+
+    area.style.display =
+        "block";
+
 
     /*
-     * Небольшая задержка нужна,
-     * чтобы SVG штрихкода успел отрисоваться.
+     * Даём SVG время отрисоваться.
      */
-    setTimeout(()=>{
+
+    setTimeout(() => {
+
         window.print();
+
     },300);
+
 }
 
-/* После закрытия окна печати очищаем область */
 
-window.addEventListener("afterprint",()=>{
-    const area=document.getElementById("print-area");
+/* =========================================================
+   ПОСЛЕ ПЕЧАТИ
+   ========================================================= */
 
-    area.innerHTML="";
-    area.style.display="none";
-});
+window.addEventListener(
+    "afterprint",
+    () => {
+
+        const area =
+            document.getElementById(
+                "print-area"
+            );
+
+
+        area.innerHTML = "";
+
+        area.style.display =
+            "none";
+
+    }
+);
+
 
 /* =========================================================
    ДОБАВЛЕНИЕ
@@ -692,63 +1258,131 @@ window.addEventListener("afterprint",()=>{
 
 async function addBulk(){
 
-    const panelPns=
-        document.getElementById("add-panel-pn").value.trim();
+    const panelPns =
+        document
+            .getElementById(
+                "add-panel-pn"
+            )
+            .value
+            .trim();
+
 
     if(!panelPns){
-        alert(translations[currentLang].errEnterPn);
+
+        alert(
+            translations[currentLang]
+                .errEnterPn
+        );
+
         return;
+
     }
 
-    const data=
-        document.getElementById("add-data").value;
 
-    const pn=
-        document.getElementById("add-pn").value.trim();
+    const data =
+        document.getElementById(
+            "add-data"
+        ).value;
 
-    const location=
-        document.getElementById("add-location").value.trim();
 
-    const info=
-        document.getElementById("add-info").value;
+    const pn =
+        document
+            .getElementById(
+                "add-pn"
+            )
+            .value
+            .trim();
 
-    document.getElementById("add-status").textContent=
-        translations[currentLang].statusRecord;
 
-    const res=await request({
-        action:"addBulk",
-        panelPns:panelPns,
-        data:data,
-        pn:pn,
-        location:location,
-        info:info
-    });
+    const location =
+        document
+            .getElementById(
+                "add-location"
+            )
+            .value
+            .trim();
 
-    document.getElementById("add-status").textContent="";
+
+    const info =
+        document.getElementById(
+            "add-info"
+        ).value;
+
+
+    document.getElementById(
+        "add-status"
+    ).textContent =
+        translations[currentLang]
+            .statusRecord;
+
+
+    const res =
+        await request({
+
+            action:"addBulk",
+
+            panelPns:panelPns,
+
+            data:data,
+
+            pn:pn,
+
+            location:location,
+
+            info:info
+
+        });
+
+
+    document.getElementById(
+        "add-status"
+    ).textContent = "";
+
 
     if(res.success){
 
         /*
          * СНАЧАЛА сохраняем данные.
-         * ПОТОМ печатаем ровно 2 этикетки.
+         * ПОТОМ печатаем 2 этикетки.
          */
+
         printLabels(
             data,
             pn,
             location
         );
 
-        document.getElementById("add-panel-pn").value="";
-        document.getElementById("add-info").value="";
 
-        setTimeout(()=>{
-            alert(res.message);
+        document.getElementById(
+            "add-panel-pn"
+        ).value = "";
+
+
+        document.getElementById(
+            "add-info"
+        ).value = "";
+
+
+        setTimeout(() => {
+
+            alert(
+                res.message
+            );
+
         },500);
 
+
     }else{
-        alert("Ошибка: "+res.error);
+
+        alert(
+            "Ошибка: " +
+            res.error
+        );
+
     }
+
 }
+
 
 /* =========================================================
    ПОИСК
@@ -756,83 +1390,181 @@ async function addBulk(){
 
 async function searchData(){
 
-    const q=
-        document.getElementById("search-query").value.trim();
+    const q =
+        document
+            .getElementById(
+                "search-query"
+            )
+            .value
+            .trim();
+
 
     if(!q){
-        alert(translations[currentLang].errEnterQuery);
+
+        alert(
+            translations[currentLang]
+                .errEnterQuery
+        );
+
         return;
+
     }
 
-    document.getElementById("search-status").textContent=
-        translations[currentLang].statusSearch;
 
-    document.getElementById("results-container").innerHTML="";
-    document.getElementById("edit-section").style.display="none";
+    document.getElementById(
+        "search-status"
+    ).textContent =
+        translations[currentLang]
+            .statusSearch;
 
-    const res=await request({
-        action:"search",
-        query:q
-    });
 
-    document.getElementById("search-status").textContent="";
+    document.getElementById(
+        "results-container"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "edit-section"
+    ).style.display =
+        "none";
+
+
+    const res =
+        await request({
+
+            action:"search",
+
+            query:q
+
+        });
+
+
+    document.getElementById(
+        "search-status"
+    ).textContent = "";
+
 
     if(res.success){
 
-        currentSearchResults=res.data;
+        currentSearchResults =
+            res.data;
 
-        if(res.data.length>0){
 
-            renderTable(res.data);
+        if(res.data.length > 0){
 
-            document.getElementById("edit-section").style.display=
+            renderTable(
+                res.data
+            );
+
+
+            document.getElementById(
+                "edit-section"
+            ).style.display =
                 "block";
+
 
         }else{
 
-            document.getElementById("results-container").innerHTML=
-                `<p class="hint">${translations[currentLang].notFound}</p>`;
+            document.getElementById(
+                "results-container"
+            ).innerHTML = `
+
+                <p class="hint">
+
+                    ${
+                        translations[currentLang]
+                            .notFound
+                    }
+
+                </p>
+
+            `;
+
         }
 
+
     }else{
-        alert("Ошибка: "+res.error);
+
+        alert(
+            "Ошибка: " +
+            res.error
+        );
+
     }
+
 }
 
+
 /* =========================================================
-   ТАБЛИЦА РЕЗУЛЬТАТОВ
+   ТАБЛИЦА
    ========================================================= */
 
 function renderTable(data){
 
-    let html=`
+    let html = `
+
         <table>
+
             <tr>
+
                 <th>Panel_pn</th>
+
                 <th>DATA</th>
+
                 <th>PN</th>
+
                 <th>Location</th>
+
                 <th>info</th>
+
             </tr>
+
     `;
 
-    data.forEach(row=>{
 
-        html+=`
+    data.forEach(row => {
+
+        html += `
+
             <tr>
-                <td>${escapeHtml(row.panel_pn)}</td>
-                <td>${escapeHtml(row.data)}</td>
-                <td>${escapeHtml(row.pn)}</td>
-                <td>${escapeHtml(row.location)}</td>
-                <td>${escapeHtml(row.info)}</td>
+
+                <td>
+                    ${escapeHtml(row.panel_pn)}
+                </td>
+
+                <td>
+                    ${escapeHtml(row.data)}
+                </td>
+
+                <td>
+                    ${escapeHtml(row.pn)}
+                </td>
+
+                <td>
+                    ${escapeHtml(row.location)}
+                </td>
+
+                <td>
+                    ${escapeHtml(row.info)}
+                </td>
+
             </tr>
+
         `;
+
     });
 
-    html+="</table>";
 
-    document.getElementById("results-container").innerHTML=html;
+    html += "</table>";
+
+
+    document.getElementById(
+        "results-container"
+    ).innerHTML =
+        html;
+
 }
+
 
 /* =========================================================
    ОБНОВЛЕНИЕ
@@ -840,106 +1572,187 @@ function renderTable(data){
 
 async function updateBulk(){
 
-    if(currentSearchResults.length===0){
+    if(currentSearchResults.length === 0){
+
         return;
+
     }
 
-    const rowNumbers=
-        currentSearchResults.map(row=>row.rowNumber);
 
-    const newData=
-        document.getElementById("edit-data").value;
+    const rowNumbers =
+        currentSearchResults.map(
+            row => row.rowNumber
+        );
 
-    const newLocation=
-        document.getElementById("edit-location").value.trim();
 
-    const newInfo=
-        document.getElementById("edit-info").value;
+    const newData =
+        document.getElementById(
+            "edit-data"
+        ).value;
 
-    if(!newData&&!newLocation&&!newInfo){
-        alert(translations[currentLang].errFillOne);
+
+    const newLocation =
+        document
+            .getElementById(
+                "edit-location"
+            )
+            .value
+            .trim();
+
+
+    const newInfo =
+        document.getElementById(
+            "edit-info"
+        ).value;
+
+
+    if(
+        !newData &&
+        !newLocation &&
+        !newInfo
+    ){
+
+        alert(
+            translations[currentLang]
+                .errFillOne
+        );
+
         return;
+
     }
 
-    if(!confirm(
+
+    if(
+        !confirm(
+            translations[currentLang]
+                .confirmUpdate(
+                    rowNumbers.length
+                )
+        )
+    ){
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "search-status"
+    ).textContent =
         translations[currentLang]
-        .confirmUpdate(rowNumbers.length)
-    )){
-        return;
-    }
+            .statusUpdate;
 
-    document.getElementById("search-status").textContent=
-        translations[currentLang].statusUpdate;
 
-    const res=await request({
-        action:"updateBulk",
-        rowNumbers:rowNumbers,
-        data:newData,
-        location:newLocation,
-        info:newInfo
-    });
+    const res =
+        await request({
 
-    document.getElementById("search-status").textContent="";
+            action:"updateBulk",
+
+            rowNumbers:rowNumbers,
+
+            data:newData,
+
+            location:newLocation,
+
+            info:newInfo
+
+        });
+
+
+    document.getElementById(
+        "search-status"
+    ).textContent = "";
+
 
     if(res.success){
 
         /*
-         * ==================================================
          * ДАННЫЕ ДЛЯ ЭТИКЕТКИ
-         * ==================================================
-         *
-         * Берём PN из ПЕРВОЙ найденной строки.
-         *
-         * Если новое значение введено —
-         * используем его.
-         *
-         * Если поле оставили пустым —
-         * используем старое значение.
          */
 
-        const firstRow=currentSearchResults[0];
+        const firstRow =
+            currentSearchResults[0];
 
-        const printData=
-            newData || firstRow.data || "";
 
-        const printPn=
-            firstRow.pn || "";
+        const printData =
+            newData ||
+            firstRow.data ||
+            "";
 
-        const printLocation=
-            newLocation || firstRow.location || "";
+
+        const printPn =
+            firstRow.pn ||
+            "";
+
+
+        const printLocation =
+            newLocation ||
+            firstRow.location ||
+            "";
+
 
         /*
-         * Обновляем Google Sheets,
-         * затем печатаем РОВНО 2 этикетки.
+         * После обновления
+         * печатаем ровно 2 этикетки.
          */
+
         printLabels(
             printData,
             printPn,
             printLocation
         );
 
+
         /*
          * Очищаем поля редактирования.
          */
-        document.getElementById("edit-data").value="";
-        document.getElementById("edit-location").value="";
-        document.getElementById("edit-info").value="";
+
+        document.getElementById(
+            "edit-data"
+        ).value = "";
+
+
+        document.getElementById(
+            "edit-location"
+        ).value = "";
+
+
+        document.getElementById(
+            "edit-info"
+        ).value = "";
+
 
         /*
-         * Обновляем таблицу после изменения.
+         * Обновляем таблицу.
          */
-        setTimeout(()=>{
+
+        setTimeout(() => {
+
             searchData();
+
         },700);
 
-        setTimeout(()=>{
-            alert(res.message);
+
+        setTimeout(() => {
+
+            alert(
+                res.message
+            );
+
         },500);
 
+
     }else{
-        alert("Ошибка: "+res.error);
+
+        alert(
+            "Ошибка: " +
+            res.error
+        );
+
     }
+
 }
+
 </script>
 
 </body>
