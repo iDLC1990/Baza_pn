@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -222,7 +223,7 @@ tr:hover{
  */
 .print-label{
     width:130mm;
-    height:200mm;
+    height:76mm;
     background:#fff;
     color:#000;
     font-family:Arial,Helvetica,sans-serif;
@@ -268,12 +269,12 @@ tr:hover{
     display:block;
     width:110mm !important;
     max-width:110mm !important;
-    height:120mm !important;
+    height:22mm !important;
     margin:6mm auto 0;
 }
 
 @page{
-    size:130mm 200mm;
+    size:130mm 76mm;
     margin:0;
 }
 
@@ -316,7 +317,7 @@ tr:hover{
     .print-label{
         display:block !important;
         width:130mm !important;
-        height:200mm !important;
+        height:76mm !important;
         margin:0 !important;
 
         /* В печати тоже 20 мм сверху и слева */
@@ -344,7 +345,7 @@ tr:hover{
     .print-barcode{
         width:110mm !important;
         max-width:110mm !important;
-        height:120mm !important;
+        height:22mm !important;
     }
 }
 
@@ -1277,7 +1278,7 @@ function printLabels(
 
                 width:2,
 
-                height:140,
+                height:70,
 
                 margin:0,
 
@@ -1287,41 +1288,6 @@ function printLabels(
 
             }
         );
-
-
-        /*
-         * ВАЖНО:
-         * JsBarcode задаёт width/height как пиксельные
-         * атрибуты SVG без viewBox, из-за чего CSS-размеры
-         * (мм) не растягивают саму картинку штрихкода.
-         * Добавляем viewBox и убираем фиксированные
-         * атрибуты, чтобы штрихкод реально масштабировался
-         * под размер, заданный в CSS.
-         */
-
-        const w =
-            svg.getAttribute("width");
-
-        const h =
-            svg.getAttribute("height");
-
-        if(w && h){
-
-            svg.setAttribute(
-                "viewBox",
-                `0 0 ${w} ${h}`
-            );
-
-            svg.setAttribute(
-                "preserveAspectRatio",
-                "none"
-            );
-
-            svg.removeAttribute("width");
-
-            svg.removeAttribute("height");
-
-        }
 
     });
 
