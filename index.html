@@ -205,6 +205,49 @@ tr:hover{
 
 
 /* =========================================================
+   МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ (замена window.confirm)
+   ========================================================= */
+
+.cc-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.cc-box{
+    background:#121922;
+    border:1px solid #2c4152;
+    border-radius:6px;
+    padding:20px;
+    max-width:320px;
+    color:#fff;
+    font-size:13px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,.6);
+}
+
+.cc-box p{
+    margin:0 0 15px;
+}
+
+.cc-box .btn{
+    margin:0 4px;
+}
+
+.btn-gray{
+    background:#3a4652;
+}
+
+.btn-gray:hover{
+    background:#4c5a68;
+}
+
+
+/* =========================================================
    ЭТИКЕТКА
    РАЗМЕР: 130 × 76 мм
    Отступ сверху и слева: 20 мм
@@ -235,6 +278,10 @@ tr:hover{
     overflow:hidden;
     page-break-after:always;
     break-after:page;
+
+    /* Не даём содержимому одной этикетки уезжать на новую страницу */
+    page-break-inside:avoid;
+    break-inside:avoid;
 }
 
 .print-block{
@@ -269,7 +316,7 @@ tr:hover{
     display:block;
     width:110mm !important;
     max-width:110mm !important;
-    height:22mm !important;
+    height:30mm !important;
     margin:6mm auto 0;
 }
 
@@ -327,6 +374,10 @@ tr:hover{
         page-break-after:always !important;
         break-after:page !important;
         overflow:hidden !important;
+
+        /* Ключевая правка: не даём Chrome разбивать этикетку на 2 страницы */
+        page-break-inside:avoid !important;
+        break-inside:avoid !important;
     }
 
     .print-block,
@@ -345,7 +396,7 @@ tr:hover{
     .print-barcode{
         width:110mm !important;
         max-width:110mm !important;
-        height:22mm !important;
+        height:30mm !important;
     }
 }
 
@@ -717,7 +768,11 @@ const translations = {
             "Заполните хотя бы одно поле!",
 
         confirmUpdate:
-            c => `Обновить ${c} строк?`
+            c => `Обновить ${c} строк?`,
+
+        confirmYes:"Да",
+
+        confirmNo:"Отмена"
     },
 
 
@@ -786,7 +841,11 @@ const translations = {
             "Заповніть хоча б одне поле!",
 
         confirmUpdate:
-            c => `Оновити ${c} рядків?`
+            c => `Оновити ${c} рядків?`,
+
+        confirmYes:"Так",
+
+        confirmNo:"Скасувати"
     },
 
 
@@ -855,7 +914,11 @@ const translations = {
             "Wypełnij co najmniej jedno pole!",
 
         confirmUpdate:
-            c => `Zaktualizować ${c} wierszy?`
+            c => `Zaktualizować ${c} wierszy?`,
+
+        confirmYes:"Tak",
+
+        confirmNo:"Anuluj"
     },
 
 
@@ -924,7 +987,11 @@ const translations = {
             "Fill out at least one field!",
 
         confirmUpdate:
-            c => `Update ${c} rows?`
+            c => `Update ${c} rows?`,
+
+        confirmYes:"Yes",
+
+        confirmNo:"Cancel"
     }
 
 };
@@ -1034,6 +1101,59 @@ window.addEventListener(
 
     }
 );
+
+
+/* =========================================================
+   МОДАЛЬНОЕ ПОДТВЕРЖДЕНИЕ
+   (замена window.confirm, которое может быть
+   заблокировано корпоративными политиками браузера)
+   ========================================================= */
+
+function customConfirm(message){
+
+    return new Promise(resolve => {
+
+        const overlay =
+            document.createElement("div");
+
+        overlay.className = "cc-overlay";
+
+        const t = translations[currentLang];
+
+        overlay.innerHTML = `
+            <div class="cc-box">
+                <p></p>
+                <button class="btn btn-blue" id="cc-yes"></button>
+                <button class="btn btn-gray" id="cc-no"></button>
+            </div>
+        `;
+
+        overlay.querySelector("p").textContent = message;
+        overlay.querySelector("#cc-yes").textContent = t.confirmYes;
+        overlay.querySelector("#cc-no").textContent = t.confirmNo;
+
+        document.body.appendChild(overlay);
+
+        const cleanup = (result) => {
+            overlay.remove();
+            resolve(result);
+        };
+
+        overlay.querySelector("#cc-yes")
+            .addEventListener("click", () => cleanup(true));
+
+        overlay.querySelector("#cc-no")
+            .addEventListener("click", () => cleanup(false));
+
+        overlay.addEventListener("click", (e) => {
+            if(e.target === overlay){
+                cleanup(false);
+            }
+        });
+
+    });
+
+}
 
 
 /* =========================================================
@@ -1278,7 +1398,7 @@ function printLabels(
 
                 width:2,
 
-                height:70,
+                height:95,
 
                 margin:0,
 
@@ -1293,29 +1413,38 @@ function printLabels(
 
 
     /*
-     * Если PN или LOCATION слишком длинные,
-     * уменьшаем шрифт, но НЕ обрезаем текст.
+     * Если содержимое этикетки не помещается по высоте
+     * (длинные PN/Location переносятся на несколько строк),
+     * уменьшаем шрифт значений, пока всё не влезет.
+     * Проверяем именно высоту всей этикетки — раньше
+     * проверялась только ширина отдельного поля,
+     * из-за чего в Chrome лишний контент "уезжал"
+     * на вторую печатную страницу.
      */
     area
-        .querySelectorAll(".print-value")
-        .forEach(el => {
+        .querySelectorAll(".print-label")
+        .forEach(label => {
 
-            let size =
-                parseFloat(
-                    getComputedStyle(el).fontSize
-                );
+            const values =
+                label.querySelectorAll(".print-value");
+
+            let size = 16;
 
             const minSize = 7;
 
             while(
-                el.scrollWidth > el.clientWidth &&
+                label.scrollHeight > label.clientHeight &&
                 size > minSize
             ){
 
                 size -= 0.5;
 
-                el.style.fontSize =
-                    size + "pt";
+                values.forEach(el => {
+
+                    el.style.fontSize =
+                        size + "pt";
+
+                });
 
             }
 
@@ -1730,14 +1859,15 @@ async function updateBulk(){
     }
 
 
-    if(
-        !confirm(
+    const confirmed =
+        await customConfirm(
             translations[currentLang]
                 .confirmUpdate(
                     rowNumbers.length
                 )
-        )
-    ){
+        );
+
+    if(!confirmed){
 
         return;
 
