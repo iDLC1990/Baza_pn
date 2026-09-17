@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -27,8 +26,8 @@ textarea{resize:vertical}
 .btn-blue:hover{background:#2dbab1}
 .btn-green{background:#145e61;margin-top:5px;width:100%}
 .btn-green:hover{background:#177a7d}
-.btn-gray{background:#3a3f45}
-.btn-gray:hover{background:#50565d}
+.btn-gray{background:#3a4652}
+.btn-gray:hover{background:#4c5a68}
 table{width:100%;border-collapse:collapse;margin-top:10px;font-size:11px;background:#121922}
 th,td{border:1px solid #2c4152;padding:5px 8px;text-align:center}
 th{background:#177a7d;font-weight:bold;color:#fff;text-transform:uppercase}
@@ -38,10 +37,9 @@ tr:hover{background:#1f2e3d}
 #edit-section{background:#121922;border:1px solid #2c4152;padding:10px;border-radius:4px;margin:10px 0}
 .hint{font-size:10px;color:#6b8296;margin:0 0 8px}
 .cc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999}
-.cc-box{background:#121922;border:1px solid #2c4152;border-radius:6px;padding:20px;max-width:320px;width:90%;color:#fff;font-size:13px;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,.6)}
-.cc-box p{margin:0 0 15px;line-height:1.4}
-.cc-actions{display:flex;gap:8px}
-.cc-actions .btn{flex:1}
+.cc-box{background:#121922;border:1px solid #2c4152;border-radius:6px;padding:20px;max-width:320px;color:#fff;font-size:13px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.6)}
+.cc-box p{margin:0 0 15px}
+.cc-box .btn{margin:0 4px}
 #toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:9999}
 .toast{background:#121922;border:1px solid #145e61;border-left:4px solid #2dbab1;border-radius:4px;padding:10px 14px;color:#fff;font-size:12px;max-width:300px;box-shadow:0 4px 15px rgba(0,0,0,.6);opacity:0;transform:translateX(20px);transition:.25s}
 .toast.show{opacity:1;transform:translateX(0)}
@@ -51,17 +49,17 @@ tr:hover{background:#1f2e3d}
 .print-block{width:100%;max-width:103mm;margin-bottom:3mm}
 .print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.5mm}
 .print-value{width:100%;max-width:103mm;font-size:16pt;font-weight:900;line-height:1.1;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;word-break:break-word}
-.print-barcode{display:block;width:110mm !important;max-width:110mm !important;height:32mm !important;margin:4mm auto 0}
+.print-barcode{display:block;width:110mm !important;max-width:110mm !important;height:30mm !important;margin:6mm auto 0}
 @page{size:130mm 76mm;margin:0}
 @media print{
 html,body{width:130mm !important;min-width:130mm !important;max-width:130mm !important;margin:0 !important;padding:0 !important;background:#fff !important}
 body *{visibility:hidden !important}
 #print-area,#print-area *{visibility:visible !important}
 #print-area{display:block !important;position:absolute !important;left:0 !important;top:0 !important;width:130mm !important;margin:0 !important;padding:0 !important}
-.print-label{display:block !important;width:130mm !important;height:76mm !important;margin:0 !important;padding:20mm 7mm 5mm 20mm !important;box-sizing:border-box !important;page-break-after:always !important;break-after:page !important;page-break-inside:avoid !important;break-inside:avoid !important;overflow:hidden !important}
+.print-label{display:block !important;width:130mm !important;height:76mm !important;margin:0 !important;padding:20mm 7mm 5mm 20mm !important;box-sizing:border-box !important;page-break-after:always !important;break-after:page !important;overflow:hidden !important;page-break-inside:avoid !important;break-inside:avoid !important}
 .print-block,.print-value{max-width:103mm !important;box-sizing:border-box !important}
 .print-value{white-space:normal !important;overflow:visible !important;overflow-wrap:anywhere !important;word-break:break-word !important}
-.print-barcode{width:110mm !important;max-width:110mm !important;height:32mm !important}
+.print-barcode{width:110mm !important;max-width:110mm !important;height:30mm !important}
 }
 </style>
 </head>
@@ -138,10 +136,10 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOn
 let currentSearchResults = [];
 let currentLang = localStorage.getItem("site_lang") || "ru";
 const translations = {
-ru:{addTitle:"Массовое добавление",labelPanelPn:"Panel_pn (Список с новой строки)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Добавить список",searchTitle:"Поиск и Редактирование",searchPlaceholder:"Введите PN или Panel_pn",btnSearch:"Найти",editTitle:"Изменить найденные строки",editHint:"Оставьте поле пустым, если не хотите его менять.",labelNewData:"Новая Дата",labelNewLocation:"Новая Локация",labelNewInfo:"Новое info",btnUpdate:"Применить изменения",statusRecord:"Запись...",statusSearch:"Поиск...",statusUpdate:"Обновление...",notFound:"Ничего не найдено.",errEnterPn:"Введите хотя бы один Panel_pn",errEnterQuery:"Введите запрос",errFillOne:"Заполните хотя бы одно поле!",confirmUpdate:c=>`Обновить ${c} строк?`,ccYes:"Да",ccNo:"Отмена"},
-uk:{addTitle:"Масове додавання",labelPanelPn:"Panel_pn (Список з нового рядка)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Додати список",searchTitle:"Пошук та Редагування",searchPlaceholder:"Введіть PN або Panel_pn",btnSearch:"Знайти",editTitle:"Змінити знайдені рядки",editHint:"Залиште поле порожнім, якщо не хочете його змінювати.",labelNewData:"Нова Дата",labelNewLocation:"Нова Локація",labelNewInfo:"Нове info",btnUpdate:"Застосувати зміни",statusRecord:"Запис...",statusSearch:"Пошук...",statusUpdate:"Оновлення...",notFound:"Нічого не знайдено.",errEnterPn:"Введіть хоча б один Panel_pn",errEnterQuery:"Введіть запит",errFillOne:"Заповніть хоча б одне поле!",confirmUpdate:c=>`Оновити ${c} рядків?`,ccYes:"Так",ccNo:"Скасувати"},
-pl:{addTitle:"Masowe dodawanie",labelPanelPn:"Panel_pn (Lista z nowej linii)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Dodaj listę",searchTitle:"Wyszukiwanie i Edycja",searchPlaceholder:"Wpisz PN lub Panel_pn",btnSearch:"Szukaj",editTitle:"Edytuj znalezione wiersze",editHint:"Pozostaw pole puste, jeśli chcesz je pominąć.",labelNewData:"Nowa Data",labelNewLocation:"Nowa Lokalizacja",labelNewInfo:"Nowe info",btnUpdate:"Zastosuj zmiany",statusRecord:"Zapisywanie...",statusSearch:"Szukanie...",statusUpdate:"Aktualizacja...",notFound:"Nic nie znaleziono.",errEnterPn:"Wprowadź co najmniej jeden Panel_pn",errEnterQuery:"Wprowadź zapytanie",errFillOne:"Wypełnij co najmniej jedno pole!",confirmUpdate:c=>`Zaktualizować ${c} wierszy?`,ccYes:"Tak",ccNo:"Anuluj"},
-en:{addTitle:"Bulk Add",labelPanelPn:"Panel_pn (List, one per line)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Add List",searchTitle:"Search & Edit",searchPlaceholder:"Enter PN or Panel_pn",btnSearch:"Search",editTitle:"Edit Found Rows",editHint:"Leave the field empty if you don't want to change it.",labelNewData:"New Date",labelNewLocation:"New Location",labelNewInfo:"New info",btnUpdate:"Apply Changes",statusRecord:"Saving...",statusSearch:"Searching...",statusUpdate:"Updating...",notFound:"Nothing found.",errEnterPn:"Enter at least one Panel_pn",errEnterQuery:"Enter search query",errFillOne:"Fill out at least one field!",confirmUpdate:c=>`Update ${c} rows?`,ccYes:"Yes",ccNo:"Cancel"}
+ru:{addTitle:"Массовое добавление",labelPanelPn:"Panel_pn (Список с новой строки)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Добавить список",searchTitle:"Поиск и Редактирование",searchPlaceholder:"Введите PN или Panel_pn",btnSearch:"Найти",editTitle:"Изменить найденные строки",editHint:"Оставьте поле пустым, если не хотите его менять.",labelNewData:"Новая Дата",labelNewLocation:"Новая Локация",labelNewInfo:"Новое info",btnUpdate:"Применить изменения",statusRecord:"Запись...",statusSearch:"Поиск...",statusUpdate:"Обновление...",notFound:"Ничего не найдено.",errEnterPn:"Введите хотя бы один Panel_pn",errEnterQuery:"Введите запрос",errFillOne:"Заполните хотя бы одно поле!",confirmUpdate:c=>`Обновить ${c} строк?`,confirmYes:"Да",confirmNo:"Отмена"},
+uk:{addTitle:"Масове додавання",labelPanelPn:"Panel_pn (Список з нового рядка)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Додати список",searchTitle:"Пошук та Редагування",searchPlaceholder:"Введіть PN або Panel_pn",btnSearch:"Знайти",editTitle:"Змінити знайдені рядки",editHint:"Залиште поле порожнім, якщо не хочете його змінювати.",labelNewData:"Нова Дата",labelNewLocation:"Нова Локація",labelNewInfo:"Нове info",btnUpdate:"Застосувати зміни",statusRecord:"Запис...",statusSearch:"Пошук...",statusUpdate:"Оновлення...",notFound:"Нічого не знайдено.",errEnterPn:"Введіть хоча б один Panel_pn",errEnterQuery:"Введіть запит",errFillOne:"Заповніть хоча б одне поле!",confirmUpdate:c=>`Оновити ${c} рядків?`,confirmYes:"Так",confirmNo:"Скасувати"},
+pl:{addTitle:"Masowe dodawanie",labelPanelPn:"Panel_pn (Lista z nowej linii)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Dodaj listę",searchTitle:"Wyszukiwanie i Edycja",searchPlaceholder:"Wpisz PN lub Panel_pn",btnSearch:"Szukaj",editTitle:"Edytuj znalezione wiersze",editHint:"Pozostaw pole puste, jeśli chcesz je pominąć.",labelNewData:"Nowa Data",labelNewLocation:"Nowa Lokalizacja",labelNewInfo:"Nowe info",btnUpdate:"Zastosuj zmiany",statusRecord:"Zapisywanie...",statusSearch:"Szukanie...",statusUpdate:"Aktualizacja...",notFound:"Nic nie znaleziono.",errEnterPn:"Wprowadź co najmniej jeden Panel_pn",errEnterQuery:"Wprowadź zapytanie",errFillOne:"Wypełnij co najmniej jedno pole!",confirmUpdate:c=>`Zaktualizować ${c} wierszy?`,confirmYes:"Tak",confirmNo:"Anuluj"},
+en:{addTitle:"Bulk Add",labelPanelPn:"Panel_pn (List, one per line)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Add List",searchTitle:"Search & Edit",searchPlaceholder:"Enter PN or Panel_pn",btnSearch:"Search",editTitle:"Edit Found Rows",editHint:"Leave the field empty if you don't want to change it.",labelNewData:"New Date",labelNewLocation:"New Location",labelNewInfo:"New info",btnUpdate:"Apply Changes",statusRecord:"Saving...",statusSearch:"Searching...",statusUpdate:"Updating...",notFound:"Nothing found.",errEnterPn:"Enter at least one Panel_pn",errEnterQuery:"Enter search query",errFillOne:"Fill out at least one field!",confirmUpdate:c=>`Update ${c} rows?`,confirmYes:"Yes",confirmNo:"Cancel"}
 };
 function setLanguage(lang,element){
 currentLang = lang;
@@ -165,26 +163,20 @@ if(translations[lang][key]) el.placeholder = translations[lang][key];
 if(currentSearchResults.length) renderTable(currentSearchResults);
 }
 window.addEventListener("DOMContentLoaded",()=>setLanguage(currentLang));
-async function request(payload){
-try{
-const response = await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
-return await response.json();
-}catch(error){
-return {success:false,error:error.message};
-}
-}
-function escapeHtml(value){
-return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-}
 function customConfirm(message){
 return new Promise(resolve=>{
 const overlay = document.createElement("div");
 overlay.className = "cc-overlay";
 const t = translations[currentLang];
-overlay.innerHTML = `<div class="cc-box"><p>${escapeHtml(message)}</p><div class="cc-actions"><button class="btn btn-blue" id="cc-yes">${escapeHtml(t.ccYes)}</button><button class="btn btn-gray" id="cc-no">${escapeHtml(t.ccNo)}</button></div></div>`;
+overlay.innerHTML = `<div class="cc-box"><p></p><button class="btn btn-blue" id="cc-yes"></button><button class="btn btn-gray" id="cc-no"></button></div>`;
+overlay.querySelector("p").textContent = message;
+overlay.querySelector("#cc-yes").textContent = t.confirmYes;
+overlay.querySelector("#cc-no").textContent = t.confirmNo;
 document.body.appendChild(overlay);
-overlay.querySelector("#cc-yes").addEventListener("click",()=>{overlay.remove();resolve(true);});
-overlay.querySelector("#cc-no").addEventListener("click",()=>{overlay.remove();resolve(false);});
+const cleanup = (result)=>{ overlay.remove(); resolve(result); };
+overlay.querySelector("#cc-yes").addEventListener("click",()=>cleanup(true));
+overlay.querySelector("#cc-no").addEventListener("click",()=>cleanup(false));
+overlay.addEventListener("click",(e)=>{ if(e.target === overlay) cleanup(false); });
 });
 }
 function showToast(message,type="success",duration=3000){
@@ -198,6 +190,17 @@ setTimeout(()=>{
 toast.classList.remove("show");
 setTimeout(()=>toast.remove(),250);
 },duration);
+}
+async function request(payload){
+try{
+const response = await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+return await response.json();
+}catch(error){
+return {success:false,error:error.message};
+}
+}
+function escapeHtml(value){
+return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 }
 function formatDate(value){
 if(!value) return "";
@@ -218,7 +221,7 @@ const locationText = escapeHtml(location);
 const label = `<div class="print-label"><div class="print-block"><div class="print-title">DATE</div><div class="print-value">${dateText}</div></div><div class="print-block"><div class="print-title">PN</div><div class="print-value">${pnText}</div></div><div class="print-block"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div><svg class="print-barcode"></svg></div>`;
 area.innerHTML = label + label;
 area.querySelectorAll(".print-barcode").forEach(svg=>{
-JsBarcode(svg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:100,margin:0,lineColor:"#000",background:"#fff"});
+JsBarcode(svg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:95,margin:0,lineColor:"#000",background:"#fff"});
 });
 area.querySelectorAll(".print-label").forEach(labelEl=>{
 const values = labelEl.querySelectorAll(".print-value");
