@@ -4,1994 +4,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
 <title>База данных деталей</title>
-
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-
 <style>
-
-*{
-    box-sizing:border-box;
-}
-
-body{
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-    background:#080d12;
-    background-image:linear-gradient(to bottom,#080d12,#101a24);
-    color:#d4d4d4;
-    margin:0;
-    padding:15px;
-    min-height:100vh;
-}
-
-.container{
-    max-width:1000px;
-    margin:0 auto;
-    display:flex;
-    flex-direction:column;
-    gap:15px;
-}
-
-.lang-switcher{
-    display:flex;
-    justify-content:flex-end;
-    gap:8px;
-    margin-bottom:-5px;
-}
-
-.lang-flag{
-    cursor:pointer;
-    font-size:20px;
-    padding:2px 4px;
-    border-radius:4px;
-    background:rgba(25,35,45,.9);
-    border:1px solid #2c4152;
-    transition:.2s;
-    line-height:1;
-}
-
-.lang-flag:hover{
-    transform:scale(1.1);
-    border-color:#2dbab1;
-}
-
-.lang-flag.active{
-    border-color:#2dbab1;
-    box-shadow:0 0 5px rgba(45,186,177,.5);
-}
-
-.card{
-    background:rgba(25,35,45,.9);
-    border:1px solid #145e61;
-    border-radius:6px;
-    padding:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,.6);
-}
-
-h2,h3{
-    margin:0 0 10px;
-    color:#2dbab1;
-    font-size:15px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-}
-
-.form-row{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:10px;
-}
-
-.form-group{
-    flex:1;
-    min-width:130px;
-    display:flex;
-    flex-direction:column;
-}
-
-label{
-    font-size:10px;
-    font-weight:bold;
-    margin-bottom:4px;
-    color:#8da4b5;
-    text-transform:uppercase;
-}
-
-input,
-textarea{
-    padding:6px 8px;
-    background:#121922;
-    border:1px solid #2c4152;
-    border-radius:4px;
-    color:#fff;
-    font-size:12px;
-    font-family:inherit;
-    transition:.2s;
-}
-
-input:focus,
-textarea:focus{
-    outline:none;
-    border-color:#2dbab1;
-    box-shadow:0 0 0 1px #2dbab1;
-}
-
-textarea{
-    resize:vertical;
-}
-
-.btn{
-    padding:8px 12px;
-    border:none;
-    border-radius:4px;
-    cursor:pointer;
-    font-weight:bold;
-    font-size:11px;
-    color:#fff;
-    text-transform:uppercase;
-    transition:.2s;
-}
-
-.btn-blue{
-    background:#177a7d;
-}
-
-.btn-blue:hover{
-    background:#2dbab1;
-}
-
-.btn-green{
-    background:#145e61;
-    margin-top:5px;
-    width:100%;
-}
-
-.btn-green:hover{
-    background:#177a7d;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-    font-size:11px;
-    background:#121922;
-}
-
-th,
-td{
-    border:1px solid #2c4152;
-    padding:5px 8px;
-    text-align:center;
-}
-
-th{
-    background:#177a7d;
-    font-weight:bold;
-    color:#fff;
-    text-transform:uppercase;
-}
-
-tr:nth-child(even){
-    background:#18232e;
-}
-
-tr:hover{
-    background:#1f2e3d;
-}
-
-.loading{
-    font-size:11px;
-    color:#2dbab1;
-    margin-top:5px;
-    font-weight:bold;
-}
-
-#edit-section{
-    background:#121922;
-    border:1px solid #2c4152;
-    padding:10px;
-    border-radius:4px;
-    margin:10px 0;
-}
-
-.hint{
-    font-size:10px;
-    color:#6b8296;
-    margin:0 0 8px;
-}
-
-
-/* =========================================================
-   МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ (замена window.confirm)
-   ========================================================= */
-
-.cc-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.6);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-}
-
-.cc-box{
-    background:#121922;
-    border:1px solid #2c4152;
-    border-radius:6px;
-    padding:20px;
-    max-width:320px;
-    color:#fff;
-    font-size:13px;
-    text-align:center;
-    box-shadow:0 4px 15px rgba(0,0,0,.6);
-}
-
-.cc-box p{
-    margin:0 0 15px;
-}
-
-.cc-box .btn{
-    margin:0 4px;
-}
-
-.btn-gray{
-    background:#3a4652;
-}
-
-.btn-gray:hover{
-    background:#4c5a68;
-}
-
-
-/* =========================================================
-   ЭТИКЕТКА
-   РАЗМЕР: 130 × 76 мм
-   Отступ сверху и слева: 20 мм
-   ========================================================= */
-
-#print-area{
-    display:none;
-}
-
-/*
- * ЭТИКЕТКА 130 × 76 мм
- *
- * Текст начинается через 20 мм от левого края
- * и 20 мм от верхнего края.
- * Штрихкод остаётся по центру этикетки, как было изначально.
- */
-.print-label{
-    width:130mm;
-    height:76mm;
-    background:#fff;
-    color:#000;
-    font-family:Arial,Helvetica,sans-serif;
-
-    /* Сверху 20 мм, слева 20 мм */
-    padding:20mm 7mm 5mm 20mm;
-
-    box-sizing:border-box;
-    overflow:hidden;
-    page-break-after:always;
-    break-after:page;
-
-    /* Не даём содержимому одной этикетки уезжать на новую страницу */
-    page-break-inside:avoid;
-    break-inside:avoid;
-}
-
-.print-block{
-    width:100%;
-    max-width:103mm;
-    margin-bottom:3mm;
-}
-
-.print-title{
-    font-size:10pt;
-    font-weight:900;
-    line-height:1;
-    margin-bottom:1.5mm;
-}
-
-.print-value{
-    width:100%;
-    max-width:103mm;
-    font-size:16pt;
-    font-weight:900;
-    line-height:1.1;
-
-    /* Длинный текст не обрезаем */
-    white-space:normal;
-    overflow:visible;
-    text-overflow:clip;
-    overflow-wrap:anywhere;
-    word-break:break-word;
-}
-
-.print-barcode{
-    display:block;
-    width:110mm !important;
-    max-width:110mm !important;
-    height:30mm !important;
-    margin:6mm auto 0;
-}
-
-@page{
-    size:130mm 76mm;
-    margin:0;
-}
-
-
-/* =========================================================
-   ПЕЧАТЬ
-   ========================================================= */
-
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#080d12;background-image:linear-gradient(to bottom,#080d12,#101a24);color:#d4d4d4;margin:0;padding:15px;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:15px}
+.lang-switcher{display:flex;justify-content:flex-end;gap:8px;margin-bottom:-5px}
+.lang-flag{cursor:pointer;font-size:20px;padding:2px 4px;border-radius:4px;background:rgba(25,35,45,.9);border:1px solid #2c4152;transition:.2s;line-height:1}
+.lang-flag:hover{transform:scale(1.1);border-color:#2dbab1}
+.lang-flag.active{border-color:#2dbab1;box-shadow:0 0 5px rgba(45,186,177,.5)}
+.card{background:rgba(25,35,45,.9);border:1px solid #145e61;border-radius:6px;padding:15px;box-shadow:0 4px 15px rgba(0,0,0,.6)}
+h2,h3{margin:0 0 10px;color:#2dbab1;font-size:15px;text-transform:uppercase;letter-spacing:1px}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.form-group{flex:1;min-width:130px;display:flex;flex-direction:column}
+label{font-size:10px;font-weight:bold;margin-bottom:4px;color:#8da4b5;text-transform:uppercase}
+input,textarea{padding:6px 8px;background:#121922;border:1px solid #2c4152;border-radius:4px;color:#fff;font-size:12px;font-family:inherit;transition:.2s}
+input:focus,textarea:focus{outline:none;border-color:#2dbab1;box-shadow:0 0 0 1px #2dbab1}
+textarea{resize:vertical}
+.btn{padding:8px 12px;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;color:#fff;text-transform:uppercase;transition:.2s}
+.btn-blue{background:#177a7d}
+.btn-blue:hover{background:#2dbab1}
+.btn-green{background:#145e61;margin-top:5px;width:100%}
+.btn-green:hover{background:#177a7d}
+.btn-gray{background:#3a3f45}
+.btn-gray:hover{background:#50565d}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:11px;background:#121922}
+th,td{border:1px solid #2c4152;padding:5px 8px;text-align:center}
+th{background:#177a7d;font-weight:bold;color:#fff;text-transform:uppercase}
+tr:nth-child(even){background:#18232e}
+tr:hover{background:#1f2e3d}
+.loading{font-size:11px;color:#2dbab1;margin-top:5px;font-weight:bold}
+#edit-section{background:#121922;border:1px solid #2c4152;padding:10px;border-radius:4px;margin:10px 0}
+.hint{font-size:10px;color:#6b8296;margin:0 0 8px}
+.cc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999}
+.cc-box{background:#121922;border:1px solid #2c4152;border-radius:6px;padding:20px;max-width:320px;width:90%;color:#fff;font-size:13px;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,.6)}
+.cc-box p{margin:0 0 15px;line-height:1.4}
+.cc-actions{display:flex;gap:8px}
+.cc-actions .btn{flex:1}
+#toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:9999}
+.toast{background:#121922;border:1px solid #145e61;border-left:4px solid #2dbab1;border-radius:4px;padding:10px 14px;color:#fff;font-size:12px;max-width:300px;box-shadow:0 4px 15px rgba(0,0,0,.6);opacity:0;transform:translateX(20px);transition:.25s}
+.toast.show{opacity:1;transform:translateX(0)}
+.toast.toast-error{border-left-color:#c0392b}
+#print-area{display:none}
+.print-label{width:130mm;height:76mm;background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;padding:20mm 7mm 5mm 20mm;box-sizing:border-box;overflow:hidden;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}
+.print-block{width:100%;max-width:103mm;margin-bottom:3mm}
+.print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.5mm}
+.print-value{width:100%;max-width:103mm;font-size:16pt;font-weight:900;line-height:1.1;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;word-break:break-word}
+.print-barcode{display:block;width:110mm !important;max-width:110mm !important;height:32mm !important;margin:4mm auto 0}
+@page{size:130mm 76mm;margin:0}
 @media print{
-
-    html,
-    body{
-        width:130mm !important;
-        min-width:130mm !important;
-        max-width:130mm !important;
-        margin:0 !important;
-        padding:0 !important;
-        background:#fff !important;
-    }
-
-    body *{
-        visibility:hidden !important;
-    }
-
-    #print-area,
-    #print-area *{
-        visibility:visible !important;
-    }
-
-    #print-area{
-        display:block !important;
-        position:absolute !important;
-        left:0 !important;
-        top:0 !important;
-        width:130mm !important;
-        margin:0 !important;
-        padding:0 !important;
-    }
-
-    .print-label{
-        display:block !important;
-        width:130mm !important;
-        height:76mm !important;
-        margin:0 !important;
-
-        /* В печати тоже 20 мм сверху и слева */
-        padding:20mm 7mm 5mm 20mm !important;
-
-        box-sizing:border-box !important;
-        page-break-after:always !important;
-        break-after:page !important;
-        overflow:hidden !important;
-
-        /* Ключевая правка: не даём Chrome разбивать этикетку на 2 страницы */
-        page-break-inside:avoid !important;
-        break-inside:avoid !important;
-    }
-
-    .print-block,
-    .print-value{
-        max-width:103mm !important;
-        box-sizing:border-box !important;
-    }
-
-    .print-value{
-        white-space:normal !important;
-        overflow:visible !important;
-        overflow-wrap:anywhere !important;
-        word-break:break-word !important;
-    }
-
-    .print-barcode{
-        width:110mm !important;
-        max-width:110mm !important;
-        height:30mm !important;
-    }
+html,body{width:130mm !important;min-width:130mm !important;max-width:130mm !important;margin:0 !important;padding:0 !important;background:#fff !important}
+body *{visibility:hidden !important}
+#print-area,#print-area *{visibility:visible !important}
+#print-area{display:block !important;position:absolute !important;left:0 !important;top:0 !important;width:130mm !important;margin:0 !important;padding:0 !important}
+.print-label{display:block !important;width:130mm !important;height:76mm !important;margin:0 !important;padding:20mm 7mm 5mm 20mm !important;box-sizing:border-box !important;page-break-after:always !important;break-after:page !important;page-break-inside:avoid !important;break-inside:avoid !important;overflow:hidden !important}
+.print-block,.print-value{max-width:103mm !important;box-sizing:border-box !important}
+.print-value{white-space:normal !important;overflow:visible !important;overflow-wrap:anywhere !important;word-break:break-word !important}
+.print-barcode{width:110mm !important;max-width:110mm !important;height:32mm !important}
 }
-
 </style>
 </head>
-
-
 <body>
-
 <div class="container">
-
-
-    <!-- ЯЗЫК -->
-
-    <div class="lang-switcher">
-
-        <span
-            class="lang-flag"
-            onclick="setLanguage('ru',this)"
-            title="Русский"
-        >🇷🇺</span>
-
-        <span
-            class="lang-flag"
-            onclick="setLanguage('uk',this)"
-            title="Українська"
-        >🇺🇦</span>
-
-        <span
-            class="lang-flag"
-            onclick="setLanguage('pl',this)"
-            title="Polski"
-        >🇵🇱</span>
-
-        <span
-            class="lang-flag"
-            onclick="setLanguage('en',this)"
-            title="English"
-        >🇬🇧</span>
-
-    </div>
-
-
-    <!-- ДОБАВЛЕНИЕ -->
-
-    <div class="card">
-
-        <h2 data-i18n="addTitle">
-            Массовое добавление
-        </h2>
-
-        <div
-            class="form-group"
-            style="margin-bottom:10px"
-        >
-
-            <label data-i18n="labelPanelPn">
-                Panel_pn (Список с новой строки)
-            </label>
-
-            <textarea
-                id="add-panel-pn"
-                rows="3"
-                placeholder="750TBV500S74HHN000&#10;750TBV500S78AHN000..."
-            ></textarea>
-
-        </div>
-
-
-        <div class="form-row">
-
-            <div class="form-group">
-
-                <label data-i18n="labelData">
-                    DATA
-                </label>
-
-                <input
-                    type="date"
-                    id="add-data"
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label data-i18n="labelPn">
-                    PN
-                </label>
-
-                <input
-                    type="text"
-                    id="add-pn"
-                    placeholder="Например: 203BYQ..."
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label data-i18n="labelLocation">
-                    Location
-                </label>
-
-                <input
-                    type="text"
-                    id="add-location"
-                    placeholder="KUWETA 666"
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label data-i18n="labelInfo">
-                    info
-                </label>
-
-                <input
-                    type="text"
-                    id="add-info"
-                    placeholder="DIFF PLATE 50"
-                >
-
-            </div>
-
-        </div>
-
-
-        <button
-            class="btn btn-blue"
-            onclick="addBulk()"
-            data-i18n="btnAdd"
-        >
-            + Добавить список
-        </button>
-
-
-        <div
-            id="add-status"
-            class="loading"
-        ></div>
-
-    </div>
-
-
-    <!-- ПОИСК -->
-
-    <div class="card">
-
-        <h2 data-i18n="searchTitle">
-            Поиск и Редактирование
-        </h2>
-
-
-        <div
-            class="form-row"
-            style="margin-bottom:5px"
-        >
-
-            <input
-                type="text"
-                id="search-query"
-                style="flex:3;min-width:200px"
-                placeholder="Введите PN или Panel_pn"
-                data-i18n-placeholder="searchPlaceholder"
-            >
-
-
-            <button
-                class="btn btn-blue"
-                style="flex:1"
-                onclick="searchData()"
-                data-i18n="btnSearch"
-            >
-                Найти
-            </button>
-
-        </div>
-
-
-        <div
-            id="search-status"
-            class="loading"
-        ></div>
-
-
-        <!-- РЕДАКТИРОВАНИЕ -->
-
-        <div
-            id="edit-section"
-            style="display:none"
-        >
-
-            <h3 data-i18n="editTitle">
-                Изменить найденные строки
-            </h3>
-
-
-            <p
-                class="hint"
-                data-i18n="editHint"
-            >
-                Оставьте поле пустым, если не хотите его менять.
-            </p>
-
-
-            <div class="form-row">
-
-                <div class="form-group">
-
-                    <label data-i18n="labelNewData">
-                        Новая Дата
-                    </label>
-
-                    <input
-                        type="date"
-                        id="edit-data"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label data-i18n="labelNewLocation">
-                        Новая Локация
-                    </label>
-
-                    <input
-                        type="text"
-                        id="edit-location"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label data-i18n="labelNewInfo">
-                        Новое info
-                    </label>
-
-                    <input
-                        type="text"
-                        id="edit-info"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <button
-                class="btn btn-green"
-                onclick="updateBulk()"
-                data-i18n="btnUpdate"
-            >
-                Применить изменения
-            </button>
-
-        </div>
-
-
-        <div style="overflow-x:auto">
-
-            <div id="results-container"></div>
-
-        </div>
-
-    </div>
-
+<div class="lang-switcher">
+<span class="lang-flag" onclick="setLanguage('ru',this)" title="Русский">🇷🇺</span>
+<span class="lang-flag" onclick="setLanguage('uk',this)" title="Українська">🇺🇦</span>
+<span class="lang-flag" onclick="setLanguage('pl',this)" title="Polski">🇵🇱</span>
+<span class="lang-flag" onclick="setLanguage('en',this)" title="English">🇬🇧</span>
 </div>
-
-
-<!-- ОБЛАСТЬ ПЕЧАТИ -->
-
+<div class="card">
+<h2 data-i18n="addTitle">Массовое добавление</h2>
+<div class="form-group" style="margin-bottom:10px">
+<label data-i18n="labelPanelPn">Panel_pn (Список с новой строки)</label>
+<textarea id="add-panel-pn" rows="3" placeholder="750TBV500S74HHN000&#10;750TBV500S78AHN000..."></textarea>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label data-i18n="labelData">DATA</label>
+<input type="date" id="add-data">
+</div>
+<div class="form-group">
+<label data-i18n="labelPn">PN</label>
+<input type="text" id="add-pn" placeholder="Например: 203BYQ...">
+</div>
+<div class="form-group">
+<label data-i18n="labelLocation">Location</label>
+<input type="text" id="add-location" placeholder="KUWETA 666">
+</div>
+<div class="form-group">
+<label data-i18n="labelInfo">info</label>
+<input type="text" id="add-info" placeholder="DIFF PLATE 50">
+</div>
+</div>
+<button class="btn btn-blue" onclick="addBulk()" data-i18n="btnAdd">+ Добавить список</button>
+<div id="add-status" class="loading"></div>
+</div>
+<div class="card">
+<h2 data-i18n="searchTitle">Поиск и Редактирование</h2>
+<div class="form-row" style="margin-bottom:5px">
+<input type="text" id="search-query" style="flex:3;min-width:200px" placeholder="Введите PN или Panel_pn" data-i18n-placeholder="searchPlaceholder">
+<button class="btn btn-blue" style="flex:1" onclick="searchData()" data-i18n="btnSearch">Найти</button>
+</div>
+<div id="search-status" class="loading"></div>
+<div id="edit-section" style="display:none">
+<h3 data-i18n="editTitle">Изменить найденные строки</h3>
+<p class="hint" data-i18n="editHint">Оставьте поле пустым, если не хотите его менять.</p>
+<div class="form-row">
+<div class="form-group">
+<label data-i18n="labelNewData">Новая Дата</label>
+<input type="date" id="edit-data">
+</div>
+<div class="form-group">
+<label data-i18n="labelNewLocation">Новая Локация</label>
+<input type="text" id="edit-location">
+</div>
+<div class="form-group">
+<label data-i18n="labelNewInfo">Новое info</label>
+<input type="text" id="edit-info">
+</div>
+</div>
+<button class="btn btn-green" onclick="updateBulk()" data-i18n="btnUpdate">Применить изменения</button>
+</div>
+<div style="overflow-x:auto">
+<div id="results-container"></div>
+</div>
+</div>
+</div>
 <div id="print-area"></div>
-
-
+<div id="toast-container"></div>
 <script>
-
-
-/* =========================================================
-   API
-   ========================================================= */
-
-const API_URL =
-"https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOnMILNgecMKkefI7P81pSR4hxiLQXIa9rirL8LCM7s0AzT/exec";
-
-
+const API_URL = "https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOnMILNgecMKkefI7P81pSR4hxiLQXIa9rirL8LCM7s0AzT/exec";
 let currentSearchResults = [];
-
-let currentLang =
-    localStorage.getItem("site_lang") || "ru";
-
-
-/* =========================================================
-   ПЕРЕВОДЫ
-   ========================================================= */
-
+let currentLang = localStorage.getItem("site_lang") || "ru";
 const translations = {
-
-    ru: {
-
-        addTitle:"Массовое добавление",
-
-        labelPanelPn:
-            "Panel_pn (Список с новой строки)",
-
-        labelData:"DATA",
-
-        labelPn:"PN",
-
-        labelLocation:"Location",
-
-        labelInfo:"info",
-
-        btnAdd:"+ Добавить список",
-
-        searchTitle:
-            "Поиск и Редактирование",
-
-        searchPlaceholder:
-            "Введите PN или Panel_pn",
-
-        btnSearch:"Найти",
-
-        editTitle:
-            "Изменить найденные строки",
-
-        editHint:
-            "Оставьте поле пустым, если не хотите его менять.",
-
-        labelNewData:
-            "Новая Дата",
-
-        labelNewLocation:
-            "Новая Локация",
-
-        labelNewInfo:
-            "Новое info",
-
-        btnUpdate:
-            "Применить изменения",
-
-        statusRecord:
-            "Запись...",
-
-        statusSearch:
-            "Поиск...",
-
-        statusUpdate:
-            "Обновление...",
-
-        notFound:
-            "Ничего не найдено.",
-
-        errEnterPn:
-            "Введите хотя бы один Panel_pn",
-
-        errEnterQuery:
-            "Введите запрос",
-
-        errFillOne:
-            "Заполните хотя бы одно поле!",
-
-        confirmUpdate:
-            c => `Обновить ${c} строк?`,
-
-        confirmYes:"Да",
-
-        confirmNo:"Отмена"
-    },
-
-
-    uk: {
-
-        addTitle:"Масове додавання",
-
-        labelPanelPn:
-            "Panel_pn (Список з нового рядка)",
-
-        labelData:"DATA",
-
-        labelPn:"PN",
-
-        labelLocation:"Location",
-
-        labelInfo:"info",
-
-        btnAdd:"+ Додати список",
-
-        searchTitle:
-            "Пошук та Редагування",
-
-        searchPlaceholder:
-            "Введіть PN або Panel_pn",
-
-        btnSearch:"Знайти",
-
-        editTitle:
-            "Змінити знайдені рядки",
-
-        editHint:
-            "Залиште поле порожнім, якщо не хочете його змінювати.",
-
-        labelNewData:
-            "Нова Дата",
-
-        labelNewLocation:
-            "Нова Локація",
-
-        labelNewInfo:
-            "Нове info",
-
-        btnUpdate:
-            "Застосувати зміни",
-
-        statusRecord:
-            "Запис...",
-
-        statusSearch:
-            "Пошук...",
-
-        statusUpdate:
-            "Оновлення...",
-
-        notFound:
-            "Нічого не знайдено.",
-
-        errEnterPn:
-            "Введіть хоча б один Panel_pn",
-
-        errEnterQuery:
-            "Введіть запит",
-
-        errFillOne:
-            "Заповніть хоча б одне поле!",
-
-        confirmUpdate:
-            c => `Оновити ${c} рядків?`,
-
-        confirmYes:"Так",
-
-        confirmNo:"Скасувати"
-    },
-
-
-    pl: {
-
-        addTitle:"Masowe dodawanie",
-
-        labelPanelPn:
-            "Panel_pn (Lista z nowej linii)",
-
-        labelData:"DATA",
-
-        labelPn:"PN",
-
-        labelLocation:"Location",
-
-        labelInfo:"info",
-
-        btnAdd:"+ Dodaj listę",
-
-        searchTitle:
-            "Wyszukiwanie i Edycja",
-
-        searchPlaceholder:
-            "Wpisz PN lub Panel_pn",
-
-        btnSearch:"Szukaj",
-
-        editTitle:
-            "Edytuj znalezione wiersze",
-
-        editHint:
-            "Pozostaw pole puste, jeśli chcesz je pominąć.",
-
-        labelNewData:
-            "Nowa Data",
-
-        labelNewLocation:
-            "Nowa Lokalizacja",
-
-        labelNewInfo:
-            "Nowe info",
-
-        btnUpdate:
-            "Zastosuj zmiany",
-
-        statusRecord:
-            "Zapisywanie...",
-
-        statusSearch:
-            "Szukanie...",
-
-        statusUpdate:
-            "Aktualizacja...",
-
-        notFound:
-            "Nic nie znaleziono.",
-
-        errEnterPn:
-            "Wprowadź co najmniej jeden Panel_pn",
-
-        errEnterQuery:
-            "Wprowadź zapytanie",
-
-        errFillOne:
-            "Wypełnij co najmniej jedno pole!",
-
-        confirmUpdate:
-            c => `Zaktualizować ${c} wierszy?`,
-
-        confirmYes:"Tak",
-
-        confirmNo:"Anuluj"
-    },
-
-
-    en: {
-
-        addTitle:"Bulk Add",
-
-        labelPanelPn:
-            "Panel_pn (List, one per line)",
-
-        labelData:"DATA",
-
-        labelPn:"PN",
-
-        labelLocation:"Location",
-
-        labelInfo:"info",
-
-        btnAdd:"+ Add List",
-
-        searchTitle:
-            "Search & Edit",
-
-        searchPlaceholder:
-            "Enter PN or Panel_pn",
-
-        btnSearch:"Search",
-
-        editTitle:
-            "Edit Found Rows",
-
-        editHint:
-            "Leave the field empty if you don't want to change it.",
-
-        labelNewData:
-            "New Date",
-
-        labelNewLocation:
-            "New Location",
-
-        labelNewInfo:
-            "New info",
-
-        btnUpdate:
-            "Apply Changes",
-
-        statusRecord:
-            "Saving...",
-
-        statusSearch:
-            "Searching...",
-
-        statusUpdate:
-            "Updating...",
-
-        notFound:
-            "Nothing found.",
-
-        errEnterPn:
-            "Enter at least one Panel_pn",
-
-        errEnterQuery:
-            "Enter search query",
-
-        errFillOne:
-            "Fill out at least one field!",
-
-        confirmUpdate:
-            c => `Update ${c} rows?`,
-
-        confirmYes:"Yes",
-
-        confirmNo:"Cancel"
-    }
-
+ru:{addTitle:"Массовое добавление",labelPanelPn:"Panel_pn (Список с новой строки)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Добавить список",searchTitle:"Поиск и Редактирование",searchPlaceholder:"Введите PN или Panel_pn",btnSearch:"Найти",editTitle:"Изменить найденные строки",editHint:"Оставьте поле пустым, если не хотите его менять.",labelNewData:"Новая Дата",labelNewLocation:"Новая Локация",labelNewInfo:"Новое info",btnUpdate:"Применить изменения",statusRecord:"Запись...",statusSearch:"Поиск...",statusUpdate:"Обновление...",notFound:"Ничего не найдено.",errEnterPn:"Введите хотя бы один Panel_pn",errEnterQuery:"Введите запрос",errFillOne:"Заполните хотя бы одно поле!",confirmUpdate:c=>`Обновить ${c} строк?`,ccYes:"Да",ccNo:"Отмена"},
+uk:{addTitle:"Масове додавання",labelPanelPn:"Panel_pn (Список з нового рядка)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Додати список",searchTitle:"Пошук та Редагування",searchPlaceholder:"Введіть PN або Panel_pn",btnSearch:"Знайти",editTitle:"Змінити знайдені рядки",editHint:"Залиште поле порожнім, якщо не хочете його змінювати.",labelNewData:"Нова Дата",labelNewLocation:"Нова Локація",labelNewInfo:"Нове info",btnUpdate:"Застосувати зміни",statusRecord:"Запис...",statusSearch:"Пошук...",statusUpdate:"Оновлення...",notFound:"Нічого не знайдено.",errEnterPn:"Введіть хоча б один Panel_pn",errEnterQuery:"Введіть запит",errFillOne:"Заповніть хоча б одне поле!",confirmUpdate:c=>`Оновити ${c} рядків?`,ccYes:"Так",ccNo:"Скасувати"},
+pl:{addTitle:"Masowe dodawanie",labelPanelPn:"Panel_pn (Lista z nowej linii)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Dodaj listę",searchTitle:"Wyszukiwanie i Edycja",searchPlaceholder:"Wpisz PN lub Panel_pn",btnSearch:"Szukaj",editTitle:"Edytuj znalezione wiersze",editHint:"Pozostaw pole puste, jeśli chcesz je pominąć.",labelNewData:"Nowa Data",labelNewLocation:"Nowa Lokalizacja",labelNewInfo:"Nowe info",btnUpdate:"Zastosuj zmiany",statusRecord:"Zapisywanie...",statusSearch:"Szukanie...",statusUpdate:"Aktualizacja...",notFound:"Nic nie znaleziono.",errEnterPn:"Wprowadź co najmniej jeden Panel_pn",errEnterQuery:"Wprowadź zapytanie",errFillOne:"Wypełnij co najmniej jedno pole!",confirmUpdate:c=>`Zaktualizować ${c} wierszy?`,ccYes:"Tak",ccNo:"Anuluj"},
+en:{addTitle:"Bulk Add",labelPanelPn:"Panel_pn (List, one per line)",labelData:"DATA",labelPn:"PN",labelLocation:"Location",labelInfo:"info",btnAdd:"+ Add List",searchTitle:"Search & Edit",searchPlaceholder:"Enter PN or Panel_pn",btnSearch:"Search",editTitle:"Edit Found Rows",editHint:"Leave the field empty if you don't want to change it.",labelNewData:"New Date",labelNewLocation:"New Location",labelNewInfo:"New info",btnUpdate:"Apply Changes",statusRecord:"Saving...",statusSearch:"Searching...",statusUpdate:"Updating...",notFound:"Nothing found.",errEnterPn:"Enter at least one Panel_pn",errEnterQuery:"Enter search query",errFillOne:"Fill out at least one field!",confirmUpdate:c=>`Update ${c} rows?`,ccYes:"Yes",ccNo:"Cancel"}
 };
-
-
-/* =========================================================
-   ЯЗЫК
-   ========================================================= */
-
 function setLanguage(lang,element){
-
-    currentLang = lang;
-
-    localStorage.setItem(
-        "site_lang",
-        lang
-    );
-
-
-    document
-        .querySelectorAll(".lang-flag")
-        .forEach(el => {
-
-            el.classList.remove("active");
-
-        });
-
-
-    if(element){
-
-        element.classList.add("active");
-
-    }else{
-
-        const flags =
-            document.querySelectorAll(".lang-flag");
-
-        const indexes = {
-            ru:0,
-            uk:1,
-            pl:2,
-            en:3
-        };
-
-        if(flags[indexes[lang]]){
-
-            flags[indexes[lang]]
-                .classList.add("active");
-
-        }
-
-    }
-
-
-    document
-        .querySelectorAll("[data-i18n]")
-        .forEach(el => {
-
-            const key =
-                el.getAttribute("data-i18n");
-
-            if(translations[lang][key]){
-
-                el.textContent =
-                    translations[lang][key];
-
-            }
-
-        });
-
-
-    document
-        .querySelectorAll("[data-i18n-placeholder]")
-        .forEach(el => {
-
-            const key =
-                el.getAttribute(
-                    "data-i18n-placeholder"
-                );
-
-            if(translations[lang][key]){
-
-                el.placeholder =
-                    translations[lang][key];
-
-            }
-
-        });
-
-
-    if(currentSearchResults.length){
-
-        renderTable(
-            currentSearchResults
-        );
-
-    }
-
+currentLang = lang;
+localStorage.setItem("site_lang",lang);
+document.querySelectorAll(".lang-flag").forEach(el=>el.classList.remove("active"));
+if(element){
+element.classList.add("active");
+}else{
+const flags = document.querySelectorAll(".lang-flag");
+const indexes = {ru:0,uk:1,pl:2,en:3};
+if(flags[indexes[lang]]) flags[indexes[lang]].classList.add("active");
 }
-
-
-window.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        setLanguage(currentLang);
-
-    }
-);
-
-
-/* =========================================================
-   МОДАЛЬНОЕ ПОДТВЕРЖДЕНИЕ
-   (замена window.confirm, которое может быть
-   заблокировано корпоративными политиками браузера)
-   ========================================================= */
-
-function customConfirm(message){
-
-    return new Promise(resolve => {
-
-        const overlay =
-            document.createElement("div");
-
-        overlay.className = "cc-overlay";
-
-        const t = translations[currentLang];
-
-        overlay.innerHTML = `
-            <div class="cc-box">
-                <p></p>
-                <button class="btn btn-blue" id="cc-yes"></button>
-                <button class="btn btn-gray" id="cc-no"></button>
-            </div>
-        `;
-
-        overlay.querySelector("p").textContent = message;
-        overlay.querySelector("#cc-yes").textContent = t.confirmYes;
-        overlay.querySelector("#cc-no").textContent = t.confirmNo;
-
-        document.body.appendChild(overlay);
-
-        const cleanup = (result) => {
-            overlay.remove();
-            resolve(result);
-        };
-
-        overlay.querySelector("#cc-yes")
-            .addEventListener("click", () => cleanup(true));
-
-        overlay.querySelector("#cc-no")
-            .addEventListener("click", () => cleanup(false));
-
-        overlay.addEventListener("click", (e) => {
-            if(e.target === overlay){
-                cleanup(false);
-            }
-        });
-
-    });
-
+document.querySelectorAll("[data-i18n]").forEach(el=>{
+const key = el.getAttribute("data-i18n");
+if(translations[lang][key]) el.textContent = translations[lang][key];
+});
+document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+const key = el.getAttribute("data-i18n-placeholder");
+if(translations[lang][key]) el.placeholder = translations[lang][key];
+});
+if(currentSearchResults.length) renderTable(currentSearchResults);
 }
-
-
-/* =========================================================
-   API REQUEST
-   ========================================================= */
-
+window.addEventListener("DOMContentLoaded",()=>setLanguage(currentLang));
 async function request(payload){
-
-    try{
-
-        const response =
-            await fetch(API_URL,{
-
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
-
-                body:
-                    JSON.stringify(payload)
-
-            });
-
-
-        return await response.json();
-
-
-    }catch(error){
-
-        return{
-
-            success:false,
-
-            error:error.message
-
-        };
-
-    }
-
+try{
+const response = await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+return await response.json();
+}catch(error){
+return {success:false,error:error.message};
 }
-
-
-/* =========================================================
-   ЗАЩИТА HTML
-   ========================================================= */
-
+}
 function escapeHtml(value){
-
-    return String(value ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
+return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 }
-
-
-/* =========================================================
-   ДАТА
-   ========================================================= */
-
+function customConfirm(message){
+return new Promise(resolve=>{
+const overlay = document.createElement("div");
+overlay.className = "cc-overlay";
+const t = translations[currentLang];
+overlay.innerHTML = `<div class="cc-box"><p>${escapeHtml(message)}</p><div class="cc-actions"><button class="btn btn-blue" id="cc-yes">${escapeHtml(t.ccYes)}</button><button class="btn btn-gray" id="cc-no">${escapeHtml(t.ccNo)}</button></div></div>`;
+document.body.appendChild(overlay);
+overlay.querySelector("#cc-yes").addEventListener("click",()=>{overlay.remove();resolve(true);});
+overlay.querySelector("#cc-no").addEventListener("click",()=>{overlay.remove();resolve(false);});
+});
+}
+function showToast(message,type="success",duration=3000){
+const container = document.getElementById("toast-container");
+const toast = document.createElement("div");
+toast.className = "toast" + (type === "error" ? " toast-error" : "");
+toast.textContent = message;
+container.appendChild(toast);
+requestAnimationFrame(()=>toast.classList.add("show"));
+setTimeout(()=>{
+toast.classList.remove("show");
+setTimeout(()=>toast.remove(),250);
+},duration);
+}
 function formatDate(value){
-
-    if(!value){
-
-        return "";
-
-    }
-
-
-    const text =
-        String(value);
-
-
-    const match =
-        text.match(
-            /^(\d{4})-(\d{2})-(\d{2})$/
-        );
-
-
-    if(match){
-
-        return `${match[3]}.${match[2]}.${match[1]}`;
-
-    }
-
-
-    return text;
-
+if(!value) return "";
+const text = String(value);
+const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+return match ? `${match[3]}.${match[2]}.${match[1]}` : text;
 }
-
-
-/* =========================================================
-   ПЕЧАТЬ ЭТИКЕТОК
-   РОВНО 2 ОДИНАКОВЫЕ ЭТИКЕТКИ
-   РАЗМЕР: 130 × 76 мм
-   ========================================================= */
-
-function printLabels(
-    data,
-    pn,
-    location
-){
-
-    const area =
-        document.getElementById(
-            "print-area"
-        );
-
-
-    /*
-     * ДАТА
-     *
-     * Берём дату из DATA.
-     * Если DATA пустая — используем текущую дату.
-     */
-    let dateValue = data;
-
-    if(!dateValue){
-
-        const now = new Date();
-
-        const year =
-            now.getFullYear();
-
-        const month =
-            String(
-                now.getMonth() + 1
-            ).padStart(2,"0");
-
-        const day =
-            String(
-                now.getDate()
-            ).padStart(2,"0");
-
-        dateValue =
-            `${year}-${month}-${day}`;
-
-    }
-
-
-    const dateText =
-        escapeHtml(
-            formatDate(dateValue)
-        );
-
-    const pnText =
-        escapeHtml(pn);
-
-    const locationText =
-        escapeHtml(location);
-
-
-    /*
-     * Одна готовая этикетка.
-     *
-     * Сохраняем старое расположение:
-     * сверху DATA / PN / LOCATION,
-     * снизу по центру штрихкод.
-     *
-     * Добавили только DATE.
-     */
-    const label = `
-
-        <div class="print-label">
-
-            <div class="print-block">
-
-                <div class="print-title">
-                    DATE
-                </div>
-
-                <div class="print-value">
-                    ${dateText}
-                </div>
-
-            </div>
-
-
-            <div class="print-block">
-
-                <div class="print-title">
-                    PN
-                </div>
-
-                <div class="print-value">
-                    ${pnText}
-                </div>
-
-            </div>
-
-
-            <div class="print-block">
-
-                <div class="print-title">
-                    LOCATION
-                </div>
-
-                <div class="print-value">
-                    ${locationText}
-                </div>
-
-            </div>
-
-
-            <svg class="print-barcode"></svg>
-
-        </div>
-
-    `;
-
-
-    /*
-     * Всегда только 2 одинаковые этикетки.
-     */
-    area.innerHTML =
-        label + label;
-
-
-    /*
-     * Создаём штрихкод.
-     */
-    const barcodes =
-        area.querySelectorAll(
-            ".print-barcode"
-        );
-
-
-    barcodes.forEach(svg => {
-
-        JsBarcode(
-            svg,
-            String(pn),
-            {
-
-                format:"CODE128B",
-
-                displayValue:false,
-
-                width:2,
-
-                height:95,
-
-                margin:0,
-
-                lineColor:"#000",
-
-                background:"#fff"
-
-            }
-        );
-
-    });
-
-
-    /*
-     * Если содержимое этикетки не помещается по высоте
-     * (длинные PN/Location переносятся на несколько строк),
-     * уменьшаем шрифт значений, пока всё не влезет.
-     * Проверяем именно высоту всей этикетки — раньше
-     * проверялась только ширина отдельного поля,
-     * из-за чего в Chrome лишний контент "уезжал"
-     * на вторую печатную страницу.
-     */
-    area
-        .querySelectorAll(".print-label")
-        .forEach(label => {
-
-            const values =
-                label.querySelectorAll(".print-value");
-
-            let size = 16;
-
-            const minSize = 7;
-
-            while(
-                label.scrollHeight > label.clientHeight &&
-                size > minSize
-            ){
-
-                size -= 0.5;
-
-                values.forEach(el => {
-
-                    el.style.fontSize =
-                        size + "pt";
-
-                });
-
-            }
-
-        });
-
-
-    area.style.display =
-        "block";
-
-
-    /*
-     * Даём браузеру время отрисовать SVG.
-     */
-    setTimeout(() => {
-
-        window.print();
-
-    },300);
-
+function printLabels(data,pn,location){
+const area = document.getElementById("print-area");
+let dateValue = data;
+if(!dateValue){
+const now = new Date();
+dateValue = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 }
-
-/* =========================================================
-   ПОСЛЕ ПЕЧАТИ
-   ========================================================= */
-
-window.addEventListener(
-    "afterprint",
-    () => {
-
-        const area =
-            document.getElementById(
-                "print-area"
-            );
-
-
-        area.innerHTML = "";
-
-        area.style.display =
-            "none";
-
-    }
-);
-
-
-/* =========================================================
-   ДОБАВЛЕНИЕ
-   ========================================================= */
-
+const dateText = escapeHtml(formatDate(dateValue));
+const pnText = escapeHtml(pn);
+const locationText = escapeHtml(location);
+const label = `<div class="print-label"><div class="print-block"><div class="print-title">DATE</div><div class="print-value">${dateText}</div></div><div class="print-block"><div class="print-title">PN</div><div class="print-value">${pnText}</div></div><div class="print-block"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div><svg class="print-barcode"></svg></div>`;
+area.innerHTML = label + label;
+area.querySelectorAll(".print-barcode").forEach(svg=>{
+JsBarcode(svg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:100,margin:0,lineColor:"#000",background:"#fff"});
+});
+area.querySelectorAll(".print-label").forEach(labelEl=>{
+const values = labelEl.querySelectorAll(".print-value");
+let size = 16;
+const minSize = 7;
+while(labelEl.scrollHeight > labelEl.clientHeight && size > minSize){
+size -= 0.5;
+values.forEach(el=>el.style.fontSize = size + "pt");
+}
+});
+area.style.display = "block";
+setTimeout(()=>window.print(),300);
+}
+window.addEventListener("afterprint",()=>{
+const area = document.getElementById("print-area");
+area.innerHTML = "";
+area.style.display = "none";
+});
 async function addBulk(){
-
-    const panelPns =
-        document
-            .getElementById(
-                "add-panel-pn"
-            )
-            .value
-            .trim();
-
-
-    if(!panelPns){
-
-        alert(
-            translations[currentLang]
-                .errEnterPn
-        );
-
-        return;
-
-    }
-
-
-    const data =
-        document.getElementById(
-            "add-data"
-        ).value;
-
-
-    const pn =
-        document
-            .getElementById(
-                "add-pn"
-            )
-            .value
-            .trim();
-
-
-    const location =
-        document
-            .getElementById(
-                "add-location"
-            )
-            .value
-            .trim();
-
-
-    const info =
-        document.getElementById(
-            "add-info"
-        ).value;
-
-
-    document.getElementById(
-        "add-status"
-    ).textContent =
-        translations[currentLang]
-            .statusRecord;
-
-
-    const res =
-        await request({
-
-            action:"addBulk",
-
-            panelPns:panelPns,
-
-            data:data,
-
-            pn:pn,
-
-            location:location,
-
-            info:info
-
-        });
-
-
-    document.getElementById(
-        "add-status"
-    ).textContent = "";
-
-
-    if(res.success){
-
-        /*
-         * СНАЧАЛА сохраняем данные.
-         * ПОТОМ печатаем 2 этикетки.
-         */
-
-        printLabels(
-            data,
-            pn,
-            location
-        );
-
-
-        document.getElementById(
-            "add-panel-pn"
-        ).value = "";
-
-
-        document.getElementById(
-            "add-info"
-        ).value = "";
-
-
-        setTimeout(() => {
-
-            alert(
-                res.message
-            );
-
-        },500);
-
-
-    }else{
-
-        alert(
-            "Ошибка: " +
-            res.error
-        );
-
-    }
-
+const panelPns = document.getElementById("add-panel-pn").value.trim();
+if(!panelPns){ showToast(translations[currentLang].errEnterPn,"error"); return; }
+const data = document.getElementById("add-data").value;
+const pn = document.getElementById("add-pn").value.trim();
+const location = document.getElementById("add-location").value.trim();
+const info = document.getElementById("add-info").value;
+document.getElementById("add-status").textContent = translations[currentLang].statusRecord;
+const res = await request({action:"addBulk",panelPns:panelPns,data:data,pn:pn,location:location,info:info});
+document.getElementById("add-status").textContent = "";
+if(res.success){
+printLabels(data,pn,location);
+document.getElementById("add-panel-pn").value = "";
+document.getElementById("add-info").value = "";
+showToast(res.message);
+}else{
+showToast("Ошибка: " + res.error,"error");
 }
-
-
-/* =========================================================
-   ПОИСК
-   ========================================================= */
-
+}
 async function searchData(){
-
-    const q =
-        document
-            .getElementById(
-                "search-query"
-            )
-            .value
-            .trim();
-
-
-    if(!q){
-
-        alert(
-            translations[currentLang]
-                .errEnterQuery
-        );
-
-        return;
-
-    }
-
-
-    document.getElementById(
-        "search-status"
-    ).textContent =
-        translations[currentLang]
-            .statusSearch;
-
-
-    document.getElementById(
-        "results-container"
-    ).innerHTML = "";
-
-
-    document.getElementById(
-        "edit-section"
-    ).style.display =
-        "none";
-
-
-    const res =
-        await request({
-
-            action:"search",
-
-            query:q
-
-        });
-
-
-    document.getElementById(
-        "search-status"
-    ).textContent = "";
-
-
-    if(res.success){
-
-        currentSearchResults =
-            res.data;
-
-
-        if(res.data.length > 0){
-
-            renderTable(
-                res.data
-            );
-
-
-            document.getElementById(
-                "edit-section"
-            ).style.display =
-                "block";
-
-
-        }else{
-
-            document.getElementById(
-                "results-container"
-            ).innerHTML = `
-
-                <p class="hint">
-
-                    ${
-                        translations[currentLang]
-                            .notFound
-                    }
-
-                </p>
-
-            `;
-
-        }
-
-
-    }else{
-
-        alert(
-            "Ошибка: " +
-            res.error
-        );
-
-    }
-
+const q = document.getElementById("search-query").value.trim();
+if(!q){ showToast(translations[currentLang].errEnterQuery,"error"); return; }
+document.getElementById("search-status").textContent = translations[currentLang].statusSearch;
+document.getElementById("results-container").innerHTML = "";
+document.getElementById("edit-section").style.display = "none";
+const res = await request({action:"search",query:q});
+document.getElementById("search-status").textContent = "";
+if(res.success){
+currentSearchResults = res.data;
+if(res.data.length > 0){
+renderTable(res.data);
+document.getElementById("edit-section").style.display = "block";
+}else{
+document.getElementById("results-container").innerHTML = `<p class="hint">${translations[currentLang].notFound}</p>`;
 }
-
-
-/* =========================================================
-   ТАБЛИЦА
-   ========================================================= */
-
+}else{
+showToast("Ошибка: " + res.error,"error");
+}
+}
 function renderTable(data){
-
-    let html = `
-
-        <table>
-
-            <tr>
-
-                <th>Panel_pn</th>
-
-                <th>DATA</th>
-
-                <th>PN</th>
-
-                <th>Location</th>
-
-                <th>info</th>
-
-            </tr>
-
-    `;
-
-
-    data.forEach(row => {
-
-        html += `
-
-            <tr>
-
-                <td>
-                    ${escapeHtml(row.panel_pn)}
-                </td>
-
-                <td>
-                    ${escapeHtml(row.data)}
-                </td>
-
-                <td>
-                    ${escapeHtml(row.pn)}
-                </td>
-
-                <td>
-                    ${escapeHtml(row.location)}
-                </td>
-
-                <td>
-                    ${escapeHtml(row.info)}
-                </td>
-
-            </tr>
-
-        `;
-
-    });
-
-
-    html += "</table>";
-
-
-    document.getElementById(
-        "results-container"
-    ).innerHTML =
-        html;
-
+let html = `<table><tr><th>Panel_pn</th><th>DATA</th><th>PN</th><th>Location</th><th>info</th></tr>`;
+data.forEach(row=>{
+html += `<tr><td>${escapeHtml(row.panel_pn)}</td><td>${escapeHtml(row.data)}</td><td>${escapeHtml(row.pn)}</td><td>${escapeHtml(row.location)}</td><td>${escapeHtml(row.info)}</td></tr>`;
+});
+html += "</table>";
+document.getElementById("results-container").innerHTML = html;
 }
-
-
-/* =========================================================
-   ОБНОВЛЕНИЕ
-   ========================================================= */
-
 async function updateBulk(){
-
-    if(currentSearchResults.length === 0){
-
-        return;
-
-    }
-
-
-    const rowNumbers =
-        currentSearchResults.map(
-            row => row.rowNumber
-        );
-
-
-    const newData =
-        document.getElementById(
-            "edit-data"
-        ).value;
-
-
-    const newLocation =
-        document
-            .getElementById(
-                "edit-location"
-            )
-            .value
-            .trim();
-
-
-    const newInfo =
-        document.getElementById(
-            "edit-info"
-        ).value;
-
-
-    if(
-        !newData &&
-        !newLocation &&
-        !newInfo
-    ){
-
-        alert(
-            translations[currentLang]
-                .errFillOne
-        );
-
-        return;
-
-    }
-
-
-    const confirmed =
-        await customConfirm(
-            translations[currentLang]
-                .confirmUpdate(
-                    rowNumbers.length
-                )
-        );
-
-    if(!confirmed){
-
-        return;
-
-    }
-
-
-    document.getElementById(
-        "search-status"
-    ).textContent =
-        translations[currentLang]
-            .statusUpdate;
-
-
-    const res =
-        await request({
-
-            action:"updateBulk",
-
-            rowNumbers:rowNumbers,
-
-            data:newData,
-
-            location:newLocation,
-
-            info:newInfo
-
-        });
-
-
-    document.getElementById(
-        "search-status"
-    ).textContent = "";
-
-
-    if(res.success){
-
-        /*
-         * ДАННЫЕ ДЛЯ ЭТИКЕТКИ
-         */
-
-        const firstRow =
-            currentSearchResults[0];
-
-
-        const printData =
-            newData ||
-            firstRow.data ||
-            "";
-
-
-        const printPn =
-            firstRow.pn ||
-            "";
-
-
-        const printLocation =
-            newLocation ||
-            firstRow.location ||
-            "";
-
-
-        /*
-         * После обновления
-         * печатаем ровно 2 этикетки.
-         */
-
-        printLabels(
-            printData,
-            printPn,
-            printLocation
-        );
-
-
-        /*
-         * Очищаем поля редактирования.
-         */
-
-        document.getElementById(
-            "edit-data"
-        ).value = "";
-
-
-        document.getElementById(
-            "edit-location"
-        ).value = "";
-
-
-        document.getElementById(
-            "edit-info"
-        ).value = "";
-
-
-        /*
-         * Обновляем таблицу.
-         */
-
-        setTimeout(() => {
-
-            searchData();
-
-        },700);
-
-
-        setTimeout(() => {
-
-            alert(
-                res.message
-            );
-
-        },500);
-
-
-    }else{
-
-        alert(
-            "Ошибка: " +
-            res.error
-        );
-
-    }
-
+if(currentSearchResults.length === 0) return;
+const rowNumbers = currentSearchResults.map(row=>row.rowNumber);
+const newData = document.getElementById("edit-data").value;
+const newLocation = document.getElementById("edit-location").value.trim();
+const newInfo = document.getElementById("edit-info").value;
+if(!newData && !newLocation && !newInfo){ showToast(translations[currentLang].errFillOne,"error"); return; }
+const confirmed = await customConfirm(translations[currentLang].confirmUpdate(rowNumbers.length));
+if(!confirmed) return;
+document.getElementById("search-status").textContent = translations[currentLang].statusUpdate;
+const res = await request({action:"updateBulk",rowNumbers:rowNumbers,data:newData,location:newLocation,info:newInfo});
+document.getElementById("search-status").textContent = "";
+if(res.success){
+const firstRow = currentSearchResults[0];
+const printData = newData || firstRow.data || "";
+const printPn = firstRow.pn || "";
+const printLocation = newLocation || firstRow.location || "";
+printLabels(printData,printPn,printLocation);
+document.getElementById("edit-data").value = "";
+document.getElementById("edit-location").value = "";
+document.getElementById("edit-info").value = "";
+setTimeout(()=>searchData(),700);
+showToast(res.message);
+}else{
+showToast("Ошибка: " + res.error,"error");
 }
-
+}
 </script>
-
 </body>
 </html>
