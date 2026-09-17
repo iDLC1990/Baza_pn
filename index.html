@@ -269,7 +269,7 @@ tr:hover{
     display:block;
     width:110mm !important;
     max-width:110mm !important;
-    height:22mm !important;
+    height:120mm !important;
     margin:6mm auto 0;
 }
 
@@ -345,7 +345,7 @@ tr:hover{
     .print-barcode{
         width:110mm !important;
         max-width:110mm !important;
-        height:22mm !important;
+        height:120mm !important;
     }
 }
 
@@ -1278,7 +1278,7 @@ function printLabels(
 
                 width:2,
 
-                height:70,
+                height:140,
 
                 margin:0,
 
@@ -1288,6 +1288,41 @@ function printLabels(
 
             }
         );
+
+
+        /*
+         * ВАЖНО:
+         * JsBarcode задаёт width/height как пиксельные
+         * атрибуты SVG без viewBox, из-за чего CSS-размеры
+         * (мм) не растягивают саму картинку штрихкода.
+         * Добавляем viewBox и убираем фиксированные
+         * атрибуты, чтобы штрихкод реально масштабировался
+         * под размер, заданный в CSS.
+         */
+
+        const w =
+            svg.getAttribute("width");
+
+        const h =
+            svg.getAttribute("height");
+
+        if(w && h){
+
+            svg.setAttribute(
+                "viewBox",
+                `0 0 ${w} ${h}`
+            );
+
+            svg.setAttribute(
+                "preserveAspectRatio",
+                "none"
+            );
+
+            svg.removeAttribute("width");
+
+            svg.removeAttribute("height");
+
+        }
 
     });
 
