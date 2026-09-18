@@ -222,7 +222,7 @@ const dateText = escapeHtml(formatDate(dateValue));
 const pnText = escapeHtml(pn);
 const locationText = escapeHtml(location);
 const label = `<div class="print-label"><div class="print-block"><div class="print-title">DATE</div><div class="print-value">${dateText}</div></div><div class="print-block"><div class="print-title">PN</div><div class="print-value">${pnText}</div></div><div class="print-block"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div><svg class="print-barcode"></svg></div>`;
-area.innerHTML = label + label;
+area.innerHTML = label;
 area.querySelectorAll(".print-barcode").forEach(svg=>{
 JsBarcode(svg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:95,margin:0,lineColor:"#000",background:"#fff"});
 });
