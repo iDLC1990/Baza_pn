@@ -71,7 +71,11 @@ tr:hover{background:#1f2e3d}
 }
 @page{size:130mm 76mm;margin:0}
 @media print{
-  html,body{width:130mm !important;min-width:130mm !important;max-width:130mm !important;margin:0 !important;padding:0 !important;background:#fff !important}
+  html,body{
+    width:130mm !important;min-width:130mm !important;max-width:130mm !important;
+    height:auto !important;min-height:0 !important;
+    margin:0 !important;padding:0 !important;background:#fff !important;
+  }
   .container{display:none !important}
   #toast-container{display:none !important}
   #print-area{
