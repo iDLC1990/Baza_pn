@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -240,7 +239,14 @@ values.forEach(el=>el.style.fontSize = size + "pt");
 }
 });
 area.style.display = "block";
-setTimeout(()=>window.print(),300);
+prepareAndPrint();
+}
+function prepareAndPrint(){
+requestAnimationFrame(()=>{
+requestAnimationFrame(()=>{
+setTimeout(()=>window.print(),120);
+});
+});
 }
 window.addEventListener("afterprint",()=>{
 const area = document.getElementById("print-area");
