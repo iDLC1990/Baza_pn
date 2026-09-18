@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -47,9 +48,7 @@ tr:hover{background:#1f2e3d}
 .toast.show{opacity:1;transform:translateX(0)}
 .toast.toast-error{border-left-color:#c0392b}
 #print-area{display:none}
-.print-label{width:130mm;height:76mm;background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;padding:20mm 7mm 5mm 20mm;box-sizing:border-box;overflow:hidden;page-break-inside:avoid;break-inside:avoid}
-.print-label:not(:last-child){page-break-after:always;break-after:page}
-.print-label:last-child{page-break-after:avoid;break-after:avoid}
+.print-label{width:130mm;height:76mm;background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;padding:20mm 7mm 5mm 20mm;box-sizing:border-box;overflow:hidden;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}
 .print-block{width:100%;max-width:103mm;margin-bottom:3mm}
 .print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.5mm}
 .print-value{width:100%;max-width:103mm;font-size:16pt;font-weight:900;line-height:1.1;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;word-break:break-word}
@@ -60,9 +59,7 @@ html,body{width:130mm !important;min-width:130mm !important;max-width:130mm !imp
 body *{visibility:hidden !important}
 #print-area,#print-area *{visibility:visible !important}
 #print-area{display:block !important;position:absolute !important;left:0 !important;top:0 !important;width:130mm !important;margin:0 !important;padding:0 !important}
-.print-label{display:block !important;width:130mm !important;height:76mm !important;margin:0 !important;padding:20mm 7mm 5mm 20mm !important;box-sizing:border-box !important;overflow:hidden !important;page-break-inside:avoid !important;break-inside:avoid !important}
-.print-label:not(:last-child){page-break-after:always !important;break-after:page !important}
-.print-label:last-child{page-break-after:avoid !important;break-after:avoid !important}
+.print-label{display:block !important;width:130mm !important;height:76mm !important;margin:0 !important;padding:20mm 7mm 5mm 20mm !important;box-sizing:border-box !important;page-break-after:always !important;break-after:page !important;overflow:hidden !important;page-break-inside:avoid !important;break-inside:avoid !important}
 .print-block,.print-value{max-width:103mm !important;box-sizing:border-box !important}
 .print-value{white-space:normal !important;overflow:visible !important;overflow-wrap:anywhere !important;word-break:break-word !important}
 .print-barcode{width:110mm !important;max-width:110mm !important;height:30mm !important}
@@ -225,7 +222,7 @@ const dateText = escapeHtml(formatDate(dateValue));
 const pnText = escapeHtml(pn);
 const locationText = escapeHtml(location);
 const label = `<div class="print-label"><div class="print-block"><div class="print-title">DATE</div><div class="print-value">${dateText}</div></div><div class="print-block"><div class="print-title">PN</div><div class="print-value">${pnText}</div></div><div class="print-block"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div><svg class="print-barcode"></svg></div>`;
-area.innerHTML = label;
+area.innerHTML = label + label;
 area.querySelectorAll(".print-barcode").forEach(svg=>{
 JsBarcode(svg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:95,margin:0,lineColor:"#000",background:"#fff"});
 });
@@ -239,14 +236,7 @@ values.forEach(el=>el.style.fontSize = size + "pt");
 }
 });
 area.style.display = "block";
-prepareAndPrint();
-}
-function prepareAndPrint(){
-requestAnimationFrame(()=>{
-requestAnimationFrame(()=>{
-setTimeout(()=>window.print(),120);
-});
-});
+setTimeout(()=>window.print(),300);
 }
 window.addEventListener("afterprint",()=>{
 const area = document.getElementById("print-area");
