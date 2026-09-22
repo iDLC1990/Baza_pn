@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -46,56 +47,6 @@ tr:hover{background:#1f2e3d}
 .toast{background:#121922;border:1px solid #145e61;border-left:4px solid #2dbab1;border-radius:4px;padding:10px 14px;color:#fff;font-size:12px;max-width:300px;box-shadow:0 4px 15px rgba(0,0,0,.6);opacity:0;transform:translateX(20px);transition:.25s}
 .toast.show{opacity:1;transform:translateX(0)}
 .toast.toast-error{border-left-color:#c0392b}
-
-/* ===== ЭТИКЕТКА ===== */
-#print-area{display:none}
-.print-label{
-  width:130mm;height:76mm;background:#fff;color:#000;
-  font-family:Arial,Helvetica,sans-serif;
-  padding:6mm 6mm 5mm 6mm;
-  box-sizing:border-box;overflow:hidden;
-}
-.print-label:not(:last-child){
-  page-break-after:always;break-after:page;
-}
-.print-block{width:100%;max-width:118mm;margin-bottom:3mm}
-.print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.5mm}
-.print-value{
-  width:100%;max-width:118mm;font-size:16pt;font-weight:900;line-height:1.1;
-  white-space:normal;overflow:visible;text-overflow:clip;
-  overflow-wrap:anywhere;word-break:break-word;
-}
-.print-barcode{
-  display:block;width:118mm !important;max-width:118mm !important;
-  height:26mm !important;margin:4mm 0 0 0;
-}
-@page{size:130mm 76mm;margin:0}
-@media print{
-  html,body{
-    width:130mm !important;min-width:130mm !important;max-width:130mm !important;
-    height:auto !important;min-height:0 !important;
-    margin:0 !important;padding:0 !important;background:#fff !important;
-  }
-  .container{display:none !important}
-  #toast-container{display:none !important}
-  #print-area{
-    display:block !important;
-    position:static !important;
-    width:130mm !important;margin:0 !important;padding:0 !important;
-  }
-  .print-label{
-    display:block !important;width:130mm !important;height:76mm !important;
-    margin:0 !important;padding:6mm 6mm 5mm 6mm !important;
-    box-sizing:border-box !important;overflow:hidden !important;
-  }
-  .print-label:not(:last-child){
-    page-break-after:always !important;break-after:page !important;
-  }
-  .print-block,.print-value{max-width:118mm !important;box-sizing:border-box !important}
-  .print-value{white-space:normal !important;overflow:visible !important;overflow-wrap:anywhere !important;word-break:break-word !important}
-  .print-barcode{width:118mm !important;max-width:118mm !important;height:26mm !important}
-}
-/* ===== КОНЕЦ БЛОКА ЭТИКЕТКИ ===== */
 </style>
 </head>
 <body>
@@ -164,7 +115,6 @@ tr:hover{background:#1f2e3d}
 </div>
 </div>
 </div>
-<div id="print-area"></div>
 <div id="toast-container"></div>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwCvcIfaYATD8AFk9PZezOnMILNgecMKkefI7P81pSR4hxiLQXIa9rirL8LCM7s0AzT/exec";
@@ -243,8 +193,14 @@ const text = String(value);
 const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 return match ? `${match[3]}.${match[2]}.${match[1]}` : text;
 }
+
+/* =========================================================
+   ПЕЧАТЬ ЭТИКЕТКИ 130x76мм — изолированный iframe со своим
+   @page (та же логика, что и printSingleNew/printInFrame во
+   втором коде): исключает влияние CSS основной страницы и
+   не оставляет пустых страниц после печати.
+   ========================================================= */
 function printLabels(data,pn,location){
-const area = document.getElementById("print-area");
 let dateValue = data;
 if(!dateValue){
 const now = new Date();
@@ -253,12 +209,74 @@ dateValue = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${
 const dateText = escapeHtml(formatDate(dateValue));
 const pnText = escapeHtml(pn);
 const locationText = escapeHtml(location);
-const label = `<div class="print-label"><div class="print-block"><div class="print-title">DATE</div><div class="print-value">${dateText}</div></div><div class="print-block"><div class="print-title">PN</div><div class="print-value">${pnText}</div></div><div class="print-block"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div><svg class="print-barcode"></svg></div>`;
-area.innerHTML = label;
-area.querySelectorAll(".print-barcode").forEach(svg=>{
-JsBarcode(svg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:95,margin:0,lineColor:"#000",background:"#fff"});
-});
-area.querySelectorAll(".print-label").forEach(labelEl=>{
+
+// Штрихкод рисуем офскрином в основном документе и переносим готовую SVG-разметку
+// в iframe строкой — так не нужно грузить JsBarcode внутри самого iframe.
+const tempSvg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+tempSvg.style.position = "absolute";
+tempSvg.style.visibility = "hidden";
+document.body.appendChild(tempSvg);
+JsBarcode(tempSvg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:95,margin:0,lineColor:"#000",background:"#fff"});
+tempSvg.removeAttribute("style");
+tempSvg.setAttribute("class","print-barcode");
+const barcodeMarkup = tempSvg.outerHTML;
+document.body.removeChild(tempSvg);
+
+const labelHtml = `<div class="print-label">`+
+`<div class="print-block"><div class="print-title">DATE</div><div class="print-value">${dateText}</div></div>`+
+`<div class="print-block"><div class="print-title">PN</div><div class="print-value">${pnText}</div></div>`+
+`<div class="print-block"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div>`+
+barcodeMarkup+
+`</div>`;
+
+printLabelInFrame(labelHtml);
+}
+
+function printLabelInFrame(labelHtml){
+const docHtml = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Label</title>
+<style>
+@page{size:130mm 76mm;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff}
+.print-label{
+width:130mm;height:76mm;background:#fff;color:#000;
+font-family:Arial,Helvetica,sans-serif;
+padding:6mm 6mm 5mm 6mm;
+overflow:hidden;
+break-inside:avoid;page-break-inside:avoid;
+}
+.print-block{width:100%;max-width:118mm;margin-bottom:3mm}
+.print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.5mm}
+.print-value{
+width:100%;max-width:118mm;font-size:16pt;font-weight:900;line-height:1.1;
+white-space:normal;overflow:visible;overflow-wrap:anywhere;word-break:break-word;
+}
+.print-barcode{display:block;width:118mm !important;max-width:118mm !important;height:26mm !important;margin:4mm 0 0 0}
+</style>
+</head>
+<body>${labelHtml}</body></html>`;
+
+const old = document.getElementById("printFrame");
+if(old) old.remove();
+
+const iframe = document.createElement("iframe");
+iframe.id = "printFrame";
+iframe.style.cssText = "position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none;";
+document.body.appendChild(iframe);
+
+const win = iframe.contentWindow;
+win.document.open();
+win.document.write(docHtml);
+win.document.close();
+
+win.onafterprint = ()=> setTimeout(()=>iframe.remove(),500);
+
+// Даём кадру отрисоваться, затем при необходимости уменьшаем шрифт, чтобы
+// длинный PN/Location вписался в этикетку, и только после этого печатаем.
+setTimeout(()=>{
+const labelEl = win.document.querySelector(".print-label");
+if(labelEl){
 const values = labelEl.querySelectorAll(".print-value");
 let size = 16;
 const minSize = 7;
@@ -266,15 +284,12 @@ while(labelEl.scrollHeight > labelEl.clientHeight && size > minSize){
 size -= 0.5;
 values.forEach(el=>el.style.fontSize = size + "pt");
 }
-});
-area.style.display = "block";
-setTimeout(()=>window.print(),300);
 }
-window.addEventListener("afterprint",()=>{
-const area = document.getElementById("print-area");
-area.innerHTML = "";
-area.style.display = "none";
-});
+win.focus();
+win.print();
+},250);
+}
+
 async function addBulk(){
 const panelPns = document.getElementById("add-panel-pn").value.trim();
 if(!panelPns){ showToast(translations[currentLang].errEnterPn,"error"); return; }
