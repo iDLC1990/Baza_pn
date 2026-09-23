@@ -195,7 +195,7 @@ return match ? `${match[3]}.${match[2]}.${match[1]}` : text;
 }
 
 /* =========================================================
-   ПЕЧАТЬ ЭТИКЕТКИ 130x90мм — изолированный iframe со своим
+   ПЕЧАТЬ ЭТИКЕТКИ 130x76мм — изолированный iframe со своим
    @page (та же логика, что и printSingleNew/printInFrame во
    втором коде): исключает влияние CSS основной страницы и
    не оставляет пустых страниц после печати.
@@ -216,7 +216,7 @@ const tempSvg = document.createElementNS("http://www.w3.org/2000/svg","svg");
 tempSvg.style.position = "absolute";
 tempSvg.style.visibility = "hidden";
 document.body.appendChild(tempSvg);
-JsBarcode(tempSvg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:95,margin:0,lineColor:"#000",background:"#fff"});
+JsBarcode(tempSvg,String(pn),{format:"CODE128B",displayValue:false,width:1.2,height:95,margin:0,lineColor:"#000",background:"#fff"});
 tempSvg.removeAttribute("style");
 tempSvg.setAttribute("class","print-barcode");
 const barcodeMarkup = tempSvg.outerHTML;
@@ -236,23 +236,23 @@ function printLabelInFrame(labelHtml){
 const docHtml = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Label</title>
 <style>
-@page{size:130mm 90mm;margin:0}
+@page{size:130mm 76mm;margin:0}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#fff}
 .print-label{
-width:130mm;height:90mm;background:#fff;color:#000;
+width:130mm;height:76mm;background:#fff;color:#000;
 font-family:Arial,Helvetica,sans-serif;
-padding:6mm 6mm 5mm 6mm;
+padding:25mm 6mm 5mm 6mm;
 overflow:hidden;
 break-inside:avoid;page-break-inside:avoid;
 }
-.print-block{width:100%;max-width:118mm;margin-bottom:3mm}
-.print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.5mm}
+.print-block{width:100%;max-width:118mm;margin-bottom:2mm}
+.print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.2mm}
 .print-value{
-width:100%;max-width:118mm;font-size:16pt;font-weight:900;line-height:1.1;
+width:100%;max-width:118mm;font-size:14pt;font-weight:900;line-height:1.1;
 white-space:normal;overflow:visible;overflow-wrap:anywhere;word-break:break-word;
 }
-.print-barcode{display:block;width:118mm !important;max-width:118mm !important;height:26mm !important;margin:4mm 0 0 0}
+.print-barcode{display:block;max-width:118mm !important;height:14mm !important;margin:2mm auto 0}
 </style>
 </head>
 <body>${labelHtml}</body></html>`;
@@ -279,7 +279,7 @@ const labelEl = win.document.querySelector(".print-label");
 if(labelEl){
 const values = labelEl.querySelectorAll(".print-value");
 const barcode = labelEl.querySelector(".print-barcode");
-const barcodeOriginalHeight = 26; // mm, как задано в CSS выше
+const barcodeOriginalHeight = 14; // mm, как задано в CSS выше
 let size = 16;
 let barcodeScale = 1;
 const minSize = 7;
