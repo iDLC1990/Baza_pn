@@ -216,7 +216,7 @@ const tempSvg = document.createElementNS("http://www.w3.org/2000/svg","svg");
 tempSvg.style.position = "absolute";
 tempSvg.style.visibility = "hidden";
 document.body.appendChild(tempSvg);
-JsBarcode(tempSvg,String(pn),{format:"CODE128B",displayValue:false,width:1.2,height:95,margin:0,lineColor:"#000",background:"#fff"});
+JsBarcode(tempSvg,String(pn),{format:"CODE128B",displayValue:false,width:2,height:95,margin:0,lineColor:"#000",background:"#fff"});
 tempSvg.removeAttribute("style");
 tempSvg.setAttribute("class","print-barcode");
 const barcodeMarkup = tempSvg.outerHTML;
@@ -252,7 +252,7 @@ break-inside:avoid;page-break-inside:avoid;
 width:100%;max-width:118mm;font-size:14pt;font-weight:900;line-height:1.1;
 white-space:normal;overflow:visible;overflow-wrap:anywhere;word-break:break-word;
 }
-.print-barcode{display:block;max-width:118mm !important;height:14mm !important;margin:2mm auto 0}
+.print-barcode{display:block;max-width:118mm !important;height:8mm !important;margin:2mm auto 0}
 </style>
 </head>
 <body>${labelHtml}</body></html>`;
@@ -279,7 +279,7 @@ const labelEl = win.document.querySelector(".print-label");
 if(labelEl){
 const values = labelEl.querySelectorAll(".print-value");
 const barcode = labelEl.querySelector(".print-barcode");
-const barcodeOriginalHeight = 14; // mm, как задано в CSS выше
+const barcodeOriginalHeight = 8; // mm, как задано в CSS выше
 let size = 16;
 let barcodeScale = 1;
 const minSize = 7;
