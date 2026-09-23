@@ -195,10 +195,9 @@ return match ? `${match[3]}.${match[2]}.${match[1]}` : text;
 }
 
 /* =========================================================
-   ПЕЧАТЬ ЭТИКЕТКИ 130x76мм — изолированный iframe со своим
-   @page (та же логика, что и printSingleNew/printInFrame во
-   втором коде): исключает влияние CSS основной страницы и
-   не оставляет пустых страниц после печати.
+   ПЕЧАТЬ ЭТИКЕТКИ 130x90мм — изолированный iframe со своим
+   @page. Штрихкод теперь идёт первым, а текстовые блоки
+   (DATE / PN / LOCATION) — под штрихкодом.
    ========================================================= */
 function printLabels(data,pn,location){
 let dateValue = data;
@@ -210,8 +209,6 @@ const dateText = escapeHtml(formatDate(dateValue));
 const pnText = escapeHtml(pn);
 const locationText = escapeHtml(location);
 
-// Штрихкод рисуем офскрином в основном документе и переносим готовую SVG-разметку
-// в iframe строкой — так не нужно грузить JsBarcode внутри самого iframe.
 const tempSvg = document.createElementNS("http://www.w3.org/2000/svg","svg");
 tempSvg.style.position = "absolute";
 tempSvg.style.visibility = "hidden";
@@ -223,10 +220,10 @@ const barcodeMarkup = tempSvg.outerHTML;
 document.body.removeChild(tempSvg);
 
 const labelHtml = `<div class="print-label">`+
+barcodeMarkup+
 `<div class="print-block"><div class="print-title">DATE</div><div class="print-value">${dateText}</div></div>`+
 `<div class="print-block"><div class="print-title">PN</div><div class="print-value">${pnText}</div></div>`+
-`<div class="print-block"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div>`+
-barcodeMarkup+
+`<div class="print-block print-block-last"><div class="print-title">LOCATION</div><div class="print-value">${locationText}</div></div>`+
 `</div>`;
 
 printLabelInFrame(labelHtml);
@@ -236,23 +233,24 @@ function printLabelInFrame(labelHtml){
 const docHtml = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Label</title>
 <style>
-@page{size:130mm 76mm;margin:0}
+@page{size:130mm 90mm;margin:0}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#fff}
 .print-label{
-width:130mm;height:76mm;background:#fff;color:#000;
+width:130mm;height:90mm;background:#fff;color:#000;
 font-family:Arial,Helvetica,sans-serif;
-padding:25mm 6mm 5mm 6mm;
+padding:6mm 6mm 5mm 6mm;
 overflow:hidden;
 break-inside:avoid;page-break-inside:avoid;
 }
-.print-block{width:100%;max-width:118mm;margin-bottom:2mm}
-.print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.2mm}
+.print-block{width:100%;max-width:118mm;margin-bottom:3mm}
+.print-block-last{margin-bottom:0}
+.print-title{font-size:10pt;font-weight:900;line-height:1;margin-bottom:1.5mm}
 .print-value{
-width:100%;max-width:118mm;font-size:14pt;font-weight:900;line-height:1.1;
+width:100%;max-width:118mm;font-size:16pt;font-weight:900;line-height:1.1;
 white-space:normal;overflow:visible;overflow-wrap:anywhere;word-break:break-word;
 }
-.print-barcode{display:block;max-width:118mm !important;height:8mm !important;margin:2mm auto 0}
+.print-barcode{display:block;width:118mm !important;max-width:118mm !important;height:26mm !important;margin:0 0 4mm 0}
 </style>
 </head>
 <body>${labelHtml}</body></html>`;
@@ -272,14 +270,12 @@ win.document.close();
 
 win.onafterprint = ()=> setTimeout(()=>iframe.remove(),500);
 
-// Даём кадру отрисоваться, затем при необходимости уменьшаем шрифт и штрихкод, чтобы
-// длинный PN/Location вписался в этикетку, и только после этого печатаем.
 setTimeout(()=>{
 const labelEl = win.document.querySelector(".print-label");
 if(labelEl){
 const values = labelEl.querySelectorAll(".print-value");
 const barcode = labelEl.querySelector(".print-barcode");
-const barcodeOriginalHeight = 8; // mm, как задано в CSS выше
+const barcodeOriginalHeight = 26; // mm, как задано в CSS выше
 let size = 16;
 let barcodeScale = 1;
 const minSize = 7;
