@@ -279,7 +279,7 @@ const barcodeOriginalHeight = 26; // mm, как задано в CSS выше
 let size = 16;
 let barcodeScale = 1;
 const minSize = 7;
-const minBarcodeScale = 0.1;
+const minBarcodeScale = 0.5;
 while(labelEl.scrollHeight > labelEl.clientHeight && (size > minSize || barcodeScale > minBarcodeScale)){
 if(size > minSize){
 size -= 0.5;
